@@ -7,6 +7,10 @@ namespace WeatherQuality.Domain.Response;
 /// </summary>
 public class Response
 {
+    public bool IsSuccess { get; set; }
+    
+    public string Error { get; set; } 
+
     [JsonPropertyName("latitude")]
     public double Latitude { get; set; }
 
