@@ -10,6 +10,7 @@ public class OpenMeteoIntegration : IIntegration
 {
     private ILogger<OpenMeteoIntegration> _logger;
     private string _baseUrl = "https://air-quality-api.open-meteo.com/v1/air-quality";
+
     public OpenMeteoIntegration(ILogger<OpenMeteoIntegration> logger)
     {
         _logger = logger;

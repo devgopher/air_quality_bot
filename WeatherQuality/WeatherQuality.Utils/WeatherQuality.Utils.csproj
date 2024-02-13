@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>WeatherQuality</RootNamespace>
+        <PackageId>WeatherQuality.Utils</PackageId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.2"/>
+        <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.1"/>
+        <PackageReference Include="System.Drawing.Common" Version="8.0.1"/>
+    </ItemGroup>
+
+</Project>

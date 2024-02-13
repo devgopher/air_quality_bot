@@ -8,9 +8,11 @@
 public class Request
 {
     public decimal Latitude { get; set; }
-    public decimal Longitude{ get; set; }
+    public decimal Longitude { get; set; }
     public string Current { get; set; } = "european_aqi";
+
     public string Hourly =
         "pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,aerosol_optical_depth,dust,uv_index,uv_index_clear_sky,alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen,european_aqi";
+
     public string Timezone { get; set; } // example: Europe%2FMoscow
 }

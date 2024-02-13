@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherQuality.Bot", "WeatherQuality.Bot\WeatherQuality.Bot.csproj", "{209367D5-43E6-46CA-AAF6-15E16C5C0FBE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherQuality.Utils", "WeatherQuality.Utils\WeatherQuality.Utils.csproj", "{209367D5-43E6-46CA-AAF6-15E16C5C0FBE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherQuality.Domain", "WeatherQuality.Domain\WeatherQuality.Domain.csproj", "{31B3CAC4-2128-45B3-93D7-B56135AC97B0}"
 EndProject
