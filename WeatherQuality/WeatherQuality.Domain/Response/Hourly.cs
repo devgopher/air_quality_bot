@@ -39,4 +39,6 @@ public class Hourly
     [JsonPropertyName("ragweed_pollen")] public List<double?> RagweedPollen { get; set; }
 
     [JsonPropertyName("european_aqi")] public List<int> EuropeanAqi { get; set; }
+    
+    [JsonPropertyName("current")] public Current Current { get; set; }
 }

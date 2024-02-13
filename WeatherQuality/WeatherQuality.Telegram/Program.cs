@@ -5,6 +5,7 @@ using Botticelli.Framework.Options;
 using Botticelli.Framework.Telegram;
 using Botticelli.Framework.Telegram.Extensions;
 using Botticelli.Framework.Telegram.Options;
+using WeatherQuality.Integration;
 using WeatherQuality.Telegram;
 using WeatherQuality.Telegram.Commands;
 using WeatherQuality.Telegram.Commands.Processors;
@@ -27,13 +28,16 @@ builder.Services
             .Set(s => s.Name = settings?.BotName))
     .AddLogging(cfg => cfg.AddNLog())
     .AddHostedService<WeatherBotHostedService>()
+    .AddScoped<IIntegration, OpenMeteoIntegration>()
     .AddScoped<StartCommandProcessor>()
     .AddScoped<StopCommandProcessor>()
     .AddBotCommand<StartCommand, StartCommandProcessor, PassValidator<StartCommand>>()
     .AddBotCommand<StopCommand, StopCommandProcessor, PassValidator<StopCommand>>();
 
 var app = builder.Build();
-app.Services.RegisterBotCommand<StartCommand, StartCommandProcessor, TelegramBot>();
-app.Services.RegisterBotCommand<StopCommand, StopCommandProcessor, TelegramBot>();
+app.Services.RegisterBotCommand<StartCommand, StartCommandProcessor, TelegramBot>()
+    .RegisterBotCommand<StopCommand, StopCommandProcessor, TelegramBot>()
+    .RegisterBotCommand<GetAirQualityCommand, GetAirQualityProcessor, TelegramBot>()
+    .RegisterBotCommand<SetLocationCommand, SetLocationProcessor, TelegramBot>();
 
 app.Run();

@@ -34,14 +34,13 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
     {
         var response = await _integration.GetAirQualityAsync(new Request
         {
-            Latitude = 0,
-            Longitude = 0,
-            Current = null,
-            Hourly = null,
-            Timezone = ""
+            Latitude = message.Location?.Latitude,
+            Longitude = message.Location?.Longitude,
+            Current = "european_aqi",
+            Hourly = "european_aqi"
         });
 
-        var image = ImageUtils.PlaceText("Images\no_pollution.org", "Воздух чистый... Но это не точно...", 15f,
+        var image = ImageUtils.PlaceText(@"Images\no_pollution.png", "Воздух чистый... Но это не точно...", 15f,
             Color.Blue, 20, 40);
 
         var respMessage = new Message
@@ -49,19 +48,16 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
             Uid = message.Uid,
             ChatIds = message.ChatIds,
             Subject = "Air Quality",
-            Body = response.Hourly.EuropeanAqi,
+            Body = response.Hourly.Current?.EuropeanAqi.ToString(),
             Attachments = new List<IAttachment>()
             {
                 new BinaryAttachment(Guid.NewGuid().ToString(), "air", MediaType.Image, string.Empty, image)
-            },
-            From = null,
-            ForwardedFrom = null,
-            Contact = null,
-            Poll = null,
-            ReplyToMessageUid = null,
-            Location = null
+            }
         };
 
-        await _bot.SendMessageAsync(new SendMessageRequest(message.Uid), token);
+        await _bot.SendMessageAsync(new SendMessageRequest(message.Uid)
+        {
+            Message = respMessage
+        }, token);
     }
 }
