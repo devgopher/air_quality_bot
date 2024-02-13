@@ -39,7 +39,7 @@ builder.Services
     .AddScoped<StopCommandProcessor>()
     .AddBotCommand<StartCommand, StartCommandProcessor, PassValidator<StartCommand>>()
     .AddBotCommand<StopCommand, StopCommandProcessor, PassValidator<StopCommand>>()
-    .AddDbContext<WeatherQualityContext>(c => c.UseNpgsql(settings!.SecureStorageConnectionString));
+    .AddDbContext<WeatherQualityContext>(c => c.UseNpgsql(settings!.DbConnectionString));
 
 // builder.ApplyMigrations<WeatherQualityContext>();
 
