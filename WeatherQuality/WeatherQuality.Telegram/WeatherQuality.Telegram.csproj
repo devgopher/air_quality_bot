@@ -14,6 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Data\" />
       <Folder Include="Images\" />
     </ItemGroup>
 
@@ -30,9 +31,16 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Update="appsettings.Development.json">
-        <DependentUpon>appsettings.json</DependentUpon>
-      </Content>
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.14"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.14">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="7.0.14"/>
+        <PackageReference Include="Npgsql" Version="7.0.6"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.11"/>
+      <PackageReference Include="NLog" Version="5.2.8" />
+      <PackageReference Include="NLog.Extensions.Logging" Version="5.3.8" />
     </ItemGroup>
 
 </Project>
