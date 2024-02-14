@@ -33,12 +33,14 @@ builder.Services
             })
             .Set(s => s.Name = settings?.BotName))
     .AddLogging(cfg => cfg.AddNLog())
-    .AddHostedService<WeatherBotHostedService>()
     .AddScoped<IIntegration, OpenMeteoIntegration>()
+    .AddHostedService<WeatherBotHostedService>()
     .AddScoped<StartCommandProcessor>()
     .AddScoped<StopCommandProcessor>()
     .AddBotCommand<StartCommand, StartCommandProcessor, PassValidator<StartCommand>>()
     .AddBotCommand<StopCommand, StopCommandProcessor, PassValidator<StopCommand>>()
+    .AddBotCommand<GetAirQualityCommand, GetAirQualityProcessor, PassValidator<GetAirQualityCommand>>()
+    .AddBotCommand<SetLocationCommand, SetLocationProcessor, PassValidator<SetLocationCommand>>()
     .AddDbContext<WeatherQualityContext>(c => c.UseNpgsql(settings!.DbConnectionString));
 
 // builder.ApplyMigrations<WeatherQualityContext>();

@@ -19,7 +19,7 @@ public class StartCommandProcessor : CommandProcessor<StartCommand>
     {
         _options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
         {
-            new KeyboardButton[]
+            new[]
             {
                 new KeyboardButton("/SetLocation")
                 {

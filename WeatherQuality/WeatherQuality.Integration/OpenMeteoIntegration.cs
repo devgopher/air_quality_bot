@@ -26,7 +26,9 @@ public class OpenMeteoIntegration : IIntegration
         try
         {
             var result = await _baseUrl
-                .SetQueryParams(request)
+                .SetQueryParam("latitude", request.Latitude)
+                .SetQueryParam("longitude", request.Longitude)
+                .SetQueryParam("current", request.Current)
                 .GetJsonAsync<Response>();
 
             result.IsSuccess = true;

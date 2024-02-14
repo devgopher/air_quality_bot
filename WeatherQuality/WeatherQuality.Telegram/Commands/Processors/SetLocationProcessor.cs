@@ -2,20 +2,41 @@
 using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
 using Botticelli.Shared.ValueObjects;
+using WeatherQuality.Telegram.Database;
+using WeatherQuality.Telegram.Database.Models;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
 
 public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
 {
-    public SetLocationProcessor(ILogger logger, ICommandValidator<SetLocationCommand> validator, MetricsProcessor metricsProcessor) : base(logger, validator, metricsProcessor)
+    private readonly WeatherQualityContext _context;
+    
+    public SetLocationProcessor(ILogger<SetLocationProcessor> logger, ICommandValidator<SetLocationCommand> validator, MetricsProcessor metricsProcessor, WeatherQualityContext context) 
+        : base(logger, validator, metricsProcessor)
+    {
+        _context = context;
+    }
+
+    protected override async Task InnerProcessContact(Message message, string args, CancellationToken token)
     {
     }
 
-    protected override Task InnerProcessContact(Message message, string args, CancellationToken token) => throw new NotImplementedException();
+    protected override async Task InnerProcessPoll(Message message, string args, CancellationToken token)  {
+    }
 
-    protected override Task InnerProcessPoll(Message message, string args, CancellationToken token) => throw new NotImplementedException();
 
-    protected override Task InnerProcessLocation(Message message, string args, CancellationToken token) => throw new NotImplementedException();
+    protected override async Task InnerProcessLocation(Message message, string args, CancellationToken token)
+    {
+        await _context.UserLocationModels.AddAsync(new UserLocationModel()
+        {
+            ChatId = message.ChatIds.FirstOrDefault(),
+            Longitude = message.Location?.Longitude,
+            Latitude = message.Location?.Latitude
+        }, token);
 
-    protected override Task InnerProcess(Message message, string args, CancellationToken token) => throw new NotImplementedException();
+        await _context.SaveChangesAsync(token);
+    }
+
+    protected override async Task InnerProcess(Message message, string args, CancellationToken token)  {
+    }
 }

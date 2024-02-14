@@ -5,7 +5,7 @@ namespace WeatherQuality.Telegram.Database.Models;
 public class UserLocationModel
 {
     [Key]
-    public Guid ChatId { get; set; }
-    public double Latitude { get; set; }
-    public double Longitude { get; set; }
+    public string ChatId { get; set; }
+    public decimal? Latitude { get; set; }
+    public decimal? Longitude { get; set; }
 }

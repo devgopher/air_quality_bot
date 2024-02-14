@@ -75,15 +75,14 @@ namespace WeatherQuality.Telegram.Migrations
 
             modelBuilder.Entity("WeatherQuality.Telegram.Database.Models.UserLocationModel", b =>
                 {
-                    b.Property<Guid>("ChatId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("ChatId")
+                        .HasColumnType("text");
 
-                    b.Property<double>("Latitude")
-                        .HasColumnType("double precision");
+                    b.Property<decimal?>("Latitude")
+                        .HasColumnType("numeric");
 
-                    b.Property<double>("Longitude")
-                        .HasColumnType("double precision");
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("numeric");
 
                     b.HasKey("ChatId");
 
