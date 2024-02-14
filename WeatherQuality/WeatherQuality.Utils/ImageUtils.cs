@@ -22,7 +22,7 @@ public static class ImageUtils
     private static readonly IImageEncoder PngEncoder = new PngEncoder
     {
         BitDepth = PngBitDepth.Bit8,
-        CompressionLevel = PngCompressionLevel.Level6,
+        CompressionLevel = PngCompressionLevel.BestCompression,
         TransparentColorMode = PngTransparentColorMode.Preserve
     };
 
@@ -31,7 +31,11 @@ public static class ImageUtils
         using var stream = new MemoryStream();
         using var img = SixLabors.ImageSharp.Image.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
             srcImagePath));
-        var font = SystemFonts.Get("Arial", CultureInfo.InvariantCulture).CreateFont(size);
+
+        FontCollection collection = new();
+        collection.Add("Fonts/ArialRegular.ttf");
+        var font = collection.Families.FirstOrDefault().CreateFont(size);
+ 
         img.Mutate(x => x.DrawText(text, font, color, new PointF
         {
             X = xOffset,
