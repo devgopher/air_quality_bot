@@ -41,6 +41,8 @@ public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
         {
             entity.Latitude = message.Location?.Latitude;
             entity.Longitude = message.Location?.Longitude;
+
+            _context.Update(entity);
         }
         
         await _context.SaveChangesAsync(token);
