@@ -2,6 +2,7 @@
 using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
 using Botticelli.Shared.ValueObjects;
+using Microsoft.EntityFrameworkCore;
 using WeatherQuality.Telegram.Database;
 using WeatherQuality.Telegram.Database.Models;
 
@@ -27,13 +28,21 @@ public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
 
     protected override async Task InnerProcessLocation(Message message, string args, CancellationToken token)
     {
-        await _context.UserLocationModels.AddAsync(new UserLocationModel()
+        var entity = await _context.UserLocationModels.FirstOrDefaultAsync(e => e.ChatId == message.ChatIds.FirstOrDefault(), 
+            cancellationToken: token);
+        if (entity == null)
+            await _context.UserLocationModels.AddAsync(new UserLocationModel()
+            {
+                ChatId = message.ChatIds.FirstOrDefault(),
+                Longitude = message.Location?.Longitude,
+                Latitude = message.Location?.Latitude
+            }, token);
+        else
         {
-            ChatId = message.ChatIds.FirstOrDefault(),
-            Longitude = message.Location?.Longitude,
-            Latitude = message.Location?.Latitude
-        }, token);
-
+            entity.Latitude = message.Location?.Latitude;
+            entity.Longitude = message.Location?.Longitude;
+        }
+        
         await _context.SaveChangesAsync(token);
     }
 

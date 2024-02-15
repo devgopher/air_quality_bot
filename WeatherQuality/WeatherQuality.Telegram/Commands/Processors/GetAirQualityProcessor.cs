@@ -39,7 +39,13 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
     protected override async Task InnerProcess(Message message, string args, CancellationToken token)
     {
         var response = await GetQuality(message);
-        var generatedImage = GenerateImage(response);
+        var generatedImage = response.Current?.EuropeanAqi switch
+        {
+            < 50 => GenerateImage(response, @"Images\no_pollution.jpg"),
+            >= 50 and < 100 => GenerateImage(response, @"Images\middle_air_pollution.jpg"),
+            _ => GenerateImage(response, @"Images\extreme_pollution.jpg")
+        };
+
         var respMessage = CreateMessage(message, response, generatedImage);
 
         await _bot.SendMessageAsync(new SendMessageRequest(message.Uid)
@@ -54,8 +60,8 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
         {
             Uid = message.Uid,
             ChatIds = message.ChatIds,
-            Subject = "Air Quality",
-            Body = response.Current?.EuropeanAqi.ToString(),
+            Subject = "AQI in: ",
+            Body = $"{response?.Latitude}, {response?.Longitude}",
             Attachments = new List<IAttachment>()
             {
                 new BinaryAttachment(Guid.NewGuid().ToString(), "air", MediaType.Image, string.Empty, image)
@@ -95,12 +101,11 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
         return response;
     }
 
-    private static byte[] GenerateImage(Response response)
+    private static byte[] GenerateImage(Response response, string path)
     {
-        var image = ImageUtils.PlaceText(@"Images\no_pollution.png",
-            $"Воздух чистый... Но это не точно..." +
-            $" AQI в вашем месте: {response.Current?.EuropeanAqi}", 60f,
-            Color.Blue, 20, 40);
+        var image = ImageUtils.PlaceText(path,
+            $"AQI: {response.Current?.EuropeanAqi}", 200f,
+            Color.Red, 200, 350);
         return image;
     }
 }

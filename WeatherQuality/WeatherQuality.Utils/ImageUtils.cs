@@ -5,6 +5,7 @@ using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
 using Brushes = SixLabors.ImageSharp.Drawing.Processing.Brushes;
@@ -19,30 +20,31 @@ namespace WeatherQuality;
 
 public static class ImageUtils
 {
-    private static readonly IImageEncoder PngEncoder = new PngEncoder
+    private static readonly IImageEncoder JngEncoder = new JpegEncoder
     {
-        BitDepth = PngBitDepth.Bit8,
-        CompressionLevel = PngCompressionLevel.BestCompression,
-        TransparentColorMode = PngTransparentColorMode.Preserve
+        SkipMetadata = true,
+        Quality = 62,
+        Interleaved = true,
+        ColorType = JpegEncodingColor.Rgb
     };
 
     public static byte[] PlaceText(string srcImagePath, string text, float size, Color color, int xOffset, int yOffset)
     {
         using var stream = new MemoryStream();
-        using var img = SixLabors.ImageSharp.Image.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+        using var image = SixLabors.ImageSharp.Image.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
             srcImagePath));
 
         FontCollection collection = new();
         collection.Add("Fonts/ArialRegular.ttf");
-        var font = collection.Families.FirstOrDefault().CreateFont(size);
+        var font = collection.Families.FirstOrDefault().CreateFont(size, FontStyle.Bold);
  
-        img.Mutate(x => x.DrawText(text, font, color, new PointF
+        image.Mutate(x => x.DrawText(text, font, color, new PointF
         {
             X = xOffset,
             Y = yOffset
         }));
 
-        img.Save(stream, PngEncoder);
+        image.Save(stream, JngEncoder);
 
         return stream.ToArray();
     }
