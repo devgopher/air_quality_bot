@@ -6,9 +6,10 @@ public class AirQualityCacheModel
 {
     [Key]
     public Guid Id { get; set; }
+    public string ChatId { get; set; }
+    
     public DateTime Timestamp { get; set; }
-    public Guid? RequestModelId { get; set; }
-    public RequestModel RequestModel { get; set; }
+    public string SerializedResponse { get; set; }
 
     /// <summary>
     /// Radius in km

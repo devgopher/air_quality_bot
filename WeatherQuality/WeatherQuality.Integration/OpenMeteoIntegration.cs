@@ -37,9 +37,9 @@ public class OpenMeteoIntegration : IIntegration
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error: {ex.Message}", ex);
+            _logger.LogError($"OpenMeteo integration error: {ex.Message}", ex);
 
-            return new Response()
+            return new Response
             {
                 IsSuccess = false,
                 Error = ex.Message

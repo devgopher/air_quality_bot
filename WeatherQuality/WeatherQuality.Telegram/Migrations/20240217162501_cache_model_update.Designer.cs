@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WeatherQuality.Telegram.Database;
@@ -11,9 +12,11 @@ using WeatherQuality.Telegram.Database;
 namespace WeatherQuality.Telegram.Migrations
 {
     [DbContext(typeof(WeatherQualityContext))]
-    partial class WeatherQualityContextModelSnapshot : ModelSnapshot
+    [Migration("20240217162501_cache_model_update")]
+    partial class cache_model_update
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,8 +35,15 @@ namespace WeatherQuality.Telegram.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<byte[]>("Image")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
                     b.Property<double>("Radius")
                         .HasColumnType("double precision");
+
+                    b.Property<Guid>("RequestModelId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("SerializedResponse")
                         .IsRequired()
@@ -43,6 +53,8 @@ namespace WeatherQuality.Telegram.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RequestModelId");
 
                     b.ToTable("AirQualityCacheModels");
                 });
@@ -90,6 +102,17 @@ namespace WeatherQuality.Telegram.Migrations
                     b.HasKey("ChatId");
 
                     b.ToTable("UserLocationModels");
+                });
+
+            modelBuilder.Entity("WeatherQuality.Telegram.Database.Models.AirQualityCacheModel", b =>
+                {
+                    b.HasOne("WeatherQuality.Telegram.Database.Models.RequestModel", "RequestModel")
+                        .WithMany()
+                        .HasForeignKey("RequestModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RequestModel");
                 });
 #pragma warning restore 612, 618
         }

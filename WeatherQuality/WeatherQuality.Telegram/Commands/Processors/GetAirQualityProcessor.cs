@@ -4,11 +4,14 @@ using Botticelli.Framework.Commands.Validators;
 using Botticelli.Shared.API.Client.Requests;
 using Botticelli.Shared.Constants;
 using Botticelli.Shared.ValueObjects;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using SixLabors.ImageSharp;
 using WeatherQuality.Domain.Request;
 using WeatherQuality.Domain.Response;
 using WeatherQuality.Integration;
 using WeatherQuality.Telegram.Database;
+using WeatherQuality.Telegram.Database.Models;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
 
@@ -38,15 +41,45 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
 
     protected override async Task InnerProcess(Message message, string args, CancellationToken token)
     {
-        var response = await GetQuality(message);
-        var generatedImage = response.Current?.EuropeanAqi switch
-        {
-            < 50 => GenerateImage(response, @"Images\no_pollution.jpg"),
-            >= 50 and < 100 => GenerateImage(response, @"Images\middle_air_pollution.jpg"),
-            _ => GenerateImage(response, @"Images\extreme_pollution.jpg")
-        };
+        Message? respMessage;
 
-        var respMessage = CreateMessage(message, response, generatedImage);
+        var cached = await _context.AirQualityCacheModels
+            .FirstOrDefaultAsync(c => message.ChatIds.Contains(c.ChatId) &&
+                                      DateTime.UtcNow - c.Timestamp < TimeSpan.FromHours(1), token);
+        if (cached != null)
+        {
+            respMessage = JsonConvert.DeserializeObject<Message>(cached.SerializedResponse, new JsonSerializerSettings()
+            {
+                Error = (sender, error) => error.ErrorContext.Handled = true
+            });
+        }
+        else
+        {
+            var response = await GetQuality(message);
+            var generatedImage = response.Current?.EuropeanAqi switch
+            {
+                < 50 => GenerateImage(response, @"Images\no_pollution.jpg"),
+                >= 50 and < 100 => GenerateImage(response, @"Images\middle_air_pollution.jpg"),
+                _ => GenerateImage(response, @"Images\extreme_pollution.jpg")
+            };
+
+            respMessage = CreateMessage(message, response, generatedImage);
+
+            foreach (var chatId in message.ChatIds)
+            {
+                var cachedMessage = new AirQualityCacheModel
+                {
+                    Id = Guid.NewGuid(),
+                    ChatId = chatId,
+                    Timestamp = DateTime.UtcNow,
+                    SerializedResponse = JsonConvert.SerializeObject(respMessage),
+                    Radius = 2.0
+                };
+                
+                await _context.AirQualityCacheModels.AddAsync(cachedMessage, token);
+                await _context.SaveChangesAsync(token);
+            }
+        }
 
         await _bot.SendMessageAsync(new SendMessageRequest(message.Uid)
         {
@@ -54,7 +87,7 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
         }, token);
     }
 
-    private static Message CreateMessage(Message message, Response response, byte[] image)
+    private static Message? CreateMessage(Message message, Response response, byte[] image)
     {
         var respMessage = new Message
         {

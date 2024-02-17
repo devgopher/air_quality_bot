@@ -12,7 +12,6 @@ using WeatherQuality.Telegram;
 using WeatherQuality.Telegram.Commands;
 using WeatherQuality.Telegram.Commands.Processors;
 using WeatherQuality.Telegram.Database;
-using WeatherQuality.Telegram.Extensions;
 using WeatherQuality.Telegram.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,7 +41,6 @@ builder.Services
     .AddBotCommand<GetAirQualityCommand, GetAirQualityProcessor, PassValidator<GetAirQualityCommand>>()
     .AddBotCommand<SetLocationCommand, SetLocationProcessor, PassValidator<SetLocationCommand>>()
     .AddDbContext<WeatherQualityContext>(c => c.UseNpgsql(settings!.DbConnectionString));
-
 // builder.ApplyMigrations<WeatherQualityContext>();
 
 var app = builder.Build();
