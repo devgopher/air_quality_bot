@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WeatherQuality.Telegram.Database;
@@ -11,9 +12,11 @@ using WeatherQuality.Telegram.Database;
 namespace WeatherQuality.Telegram.Migrations
 {
     [DbContext(typeof(WeatherQualityContext))]
-    partial class WeatherQualityContextModelSnapshot : ModelSnapshot
+    [Migration("20240221201025_AirDetails")]
+    partial class AirDetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,31 +25,6 @@ namespace WeatherQuality.Telegram.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("WeatherQuality.Telegram.Database.Models.AirQualityCacheDetailsModel", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ChatId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<double>("Radius")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("SerializedResponse")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AirQualityCacheDetailsModels");
-                });
-
             modelBuilder.Entity("WeatherQuality.Telegram.Database.Models.AirQualityCacheModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -54,6 +32,10 @@ namespace WeatherQuality.Telegram.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("ChatId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Discriminator")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -70,6 +52,10 @@ namespace WeatherQuality.Telegram.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AirQualityCacheModels");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("AirQualityCacheModel");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("WeatherQuality.Telegram.Database.Models.RequestModel", b =>
@@ -115,6 +101,13 @@ namespace WeatherQuality.Telegram.Migrations
                     b.HasKey("ChatId");
 
                     b.ToTable("UserLocationModels");
+                });
+
+            modelBuilder.Entity("WeatherQuality.Telegram.Database.Models.AirQualityCacheDetailsModel", b =>
+                {
+                    b.HasBaseType("WeatherQuality.Telegram.Database.Models.AirQualityCacheModel");
+
+                    b.HasDiscriminator().HasValue("AirQualityCacheDetailsModel");
                 });
 #pragma warning restore 612, 618
         }

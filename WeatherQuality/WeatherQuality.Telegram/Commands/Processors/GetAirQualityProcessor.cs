@@ -34,7 +34,7 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
                                                                          {
                                                                              new KeyboardButton("/Details")
                                                                              {
-                                                                                 RequestLocation = true
+                                                                                 RequestLocation = false
                                                                              }
                                                                          }
                                                                      })
@@ -72,27 +72,32 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
         else
         {
             var response = await GetQuality(message);
+            
             var generatedImage = response.Current?.EuropeanAqi switch
             {
-                < 50 => GenerateImage(response, @"Images\no_pollution.jpg"),
+                < 50            => GenerateImage(response, @"Images\no_pollution.jpg"),
                 >= 50 and < 100 => GenerateImage(response, @"Images\middle_air_pollution.jpg"),
-                _ => GenerateImage(response, @"Images\extreme_pollution.jpg")
+                >=100           => GenerateImage(response, @"Images\extreme_pollution.jpg"),
+                _               => null
             };
 
             respMessage = CreateMessage(message, response, generatedImage);
 
-            foreach (var cachedMessage in message.ChatIds.Select(chatId
-                                                                         => new AirQualityCacheModel
-                                                                         {
-                                                                             Id = Guid.NewGuid(),
-                                                                             ChatId = chatId,
-                                                                             Timestamp = DateTime.UtcNow,
-                                                                             SerializedResponse = JsonConvert.SerializeObject(respMessage),
-                                                                             Radius = 2.0
-                                                                         }))
+            if (string.IsNullOrWhiteSpace(response.Error))
             {
-                await _context.AirQualityCacheModels.AddAsync(cachedMessage, token);
-                await _context.SaveChangesAsync(token);
+                foreach (var cachedMessage in message.ChatIds.Select(chatId
+                                                                             => new AirQualityCacheModel
+                                                                             {
+                                                                                 Id = Guid.NewGuid(),
+                                                                                 ChatId = chatId,
+                                                                                 Timestamp = DateTime.UtcNow,
+                                                                                 SerializedResponse = JsonConvert.SerializeObject(respMessage),
+                                                                                 Radius = 2.0
+                                                                             }))
+                {
+                    await _context.AirQualityCacheModels.AddAsync(cachedMessage, token);
+                    await _context.SaveChangesAsync(token);
+                }
             }
         }
 
@@ -102,19 +107,27 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
         }, _options, token);
     }
 
-    private static Message? CreateMessage(Message message, Response response, byte[] image)
+    private static Message? CreateMessage(Message message, Response response, byte[]? image = null)
     {
         var respMessage = new Message
         {
             Uid = message.Uid,
             ChatIds = message.ChatIds,
             Subject = "AQI in: ",
-            Body = $"{response?.Latitude}, {response?.Longitude}",
-            Attachments = new List<IAttachment>()
-            {
-                new BinaryAttachment(Guid.NewGuid().ToString(), "air", MediaType.Image, string.Empty, image)
-            }
+            Body = !string.IsNullOrWhiteSpace(response.Error) ? response.Error
+                    : $"{response?.Latitude}, {response?.Longitude}"
         };
+
+        if (image != null)
+            respMessage.Attachments = new List<IAttachment>()
+            {
+                new BinaryAttachment(Guid.NewGuid().ToString(),
+                                     "air",
+                                     MediaType.Image,
+                                     string.Empty,
+                                     image)
+            };
+        
         return respMessage;
     }
 
@@ -149,11 +162,11 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
         return response;
     }
 
-    private static byte[] GenerateImage(Response response, string path)
+    private static byte[]? GenerateImage(Response response, string path)
     {
         var image = ImageUtils.PlaceText(path,
-            $"AQI: {response.Current?.EuropeanAqi}", 200f,
-            Color.Red, 200, 350);
+                                         $"AQI: {response.Current?.EuropeanAqi}", 200f,
+                                         Color.Red, 200, 350);
         return image;
     }
 }

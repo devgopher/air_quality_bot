@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WeatherQuality.Telegram.Database;
@@ -11,9 +12,11 @@ using WeatherQuality.Telegram.Database;
 namespace WeatherQuality.Telegram.Migrations
 {
     [DbContext(typeof(WeatherQualityContext))]
-    partial class WeatherQualityContextModelSnapshot : ModelSnapshot
+    [Migration("20240221202156_AirDetails1")]
+    partial class AirDetails1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

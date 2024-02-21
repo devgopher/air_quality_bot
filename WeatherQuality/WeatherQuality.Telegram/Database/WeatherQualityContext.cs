@@ -9,6 +9,7 @@ public class WeatherQualityContext : DbContext
     {}
 
     public DbSet<AirQualityCacheModel> AirQualityCacheModels { get; set; }
+    public DbSet<AirQualityCacheDetailsModel> AirQualityCacheDetailsModels { get; set; }
     public DbSet<RequestModel> RequestModels { get; set; }
     public DbSet<UserLocationModel> UserLocationModels { get; set; }
 }

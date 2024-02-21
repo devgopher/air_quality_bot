@@ -28,7 +28,7 @@ public static class ImageUtils
         ColorType = JpegEncodingColor.Rgb
     };
 
-    public static byte[] PlaceText(string srcImagePath, string text, float size, Color color, int xOffset, int yOffset)
+    public static byte[]? PlaceText(string srcImagePath, string text, float size, Color color, int xOffset, int yOffset)
     {
         using var stream = new MemoryStream();
         using var image = SixLabors.ImageSharp.Image.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,

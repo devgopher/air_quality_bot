@@ -38,7 +38,7 @@ public class DetailsProcessor : CommandProcessor<DetailsCommand>
     {
         Message? respMessage;
 
-        var cached = await _context.AirQualityCacheModels
+        var cached = await _context.AirQualityCacheDetailsModels
                                    .FirstOrDefaultAsync(c => message.ChatIds.Contains(c.ChatId) &&
                                                              DateTime.UtcNow - c.Timestamp < TimeSpan.FromHours(1),
                                                         token);
@@ -57,7 +57,7 @@ public class DetailsProcessor : CommandProcessor<DetailsCommand>
             respMessage = CreateMessage(message, response);
 
             foreach (var cachedMessage in message.ChatIds.Select(chatId
-                                                                         => new AirQualityCacheModel
+                                                                         => new AirQualityCacheDetailsModel()
                                                                          {
                                                                              Id = Guid.NewGuid(),
                                                                              ChatId = chatId,
@@ -66,7 +66,7 @@ public class DetailsProcessor : CommandProcessor<DetailsCommand>
                                                                              Radius = 2.0
                                                                          }))
             {
-                await _context.AirQualityCacheModels.AddAsync(cachedMessage, token);
+                await _context.AirQualityCacheDetailsModels.AddAsync(cachedMessage, token);
                 await _context.SaveChangesAsync(token);
             }
         }
@@ -85,7 +85,7 @@ public class DetailsProcessor : CommandProcessor<DetailsCommand>
             Uid = message.Uid,
             ChatIds = message.ChatIds,
             Subject = "Main air quality indicators. \n",
-            Body = $"Carbon monoxide: {response.Current?.CarbonMonoxide} μg/m^3 \n" +
+            Body = $"\n\nCarbon monoxide: {response.Current?.CarbonMonoxide} μg/m^3 \n" +
                    $"Nitrogen dioxide: {response.Current?.NitrogenDioxide} μg/m^3 \n" +
                    $"Sulphur dioxide: {response.Current?.SulphurDioxide} μg/m^3 \n" +
                    $"Dust: {response.Current?.Dust} μg/m^3"
