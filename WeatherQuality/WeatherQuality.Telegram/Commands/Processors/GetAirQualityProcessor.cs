@@ -1,12 +1,14 @@
 ﻿using Botticelli.Client.Analytics;
 using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
+using Botticelli.Framework.SendOptions;
 using Botticelli.Shared.API.Client.Requests;
 using Botticelli.Shared.Constants;
 using Botticelli.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using SixLabors.ImageSharp;
+using Telegram.Bot.Types.ReplyMarkups;
 using WeatherQuality.Domain.Request;
 using WeatherQuality.Domain.Response;
 using WeatherQuality.Integration;
@@ -19,12 +21,26 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
 {
     private readonly IIntegration _integration;
     private readonly WeatherQualityContext _context;
-
+    private readonly SendOptionsBuilder<ReplyMarkupBase> _options;
+    
     public GetAirQualityProcessor(ILogger<GetAirQualityProcessor> logger, ICommandValidator<GetAirQualityCommand> validator,
         MetricsProcessor metricsProcessor, IIntegration integration, WeatherQualityContext context) : base(logger, validator, metricsProcessor)
     {
         _integration = integration;
         _context = context;
+        _options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
+                                                                     {
+                                                                         new[]
+                                                                         {
+                                                                             new KeyboardButton("/Details")
+                                                                             {
+                                                                                 RequestLocation = true
+                                                                             }
+                                                                         }
+                                                                     })
+                                                                     {
+                                                                         ResizeKeyboard = true
+                                                                     });
     }
 
     protected override async Task InnerProcessContact(Message message, string args, CancellationToken token)
@@ -65,17 +81,16 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
 
             respMessage = CreateMessage(message, response, generatedImage);
 
-            foreach (var chatId in message.ChatIds)
+            foreach (var cachedMessage in message.ChatIds.Select(chatId
+                                                                         => new AirQualityCacheModel
+                                                                         {
+                                                                             Id = Guid.NewGuid(),
+                                                                             ChatId = chatId,
+                                                                             Timestamp = DateTime.UtcNow,
+                                                                             SerializedResponse = JsonConvert.SerializeObject(respMessage),
+                                                                             Radius = 2.0
+                                                                         }))
             {
-                var cachedMessage = new AirQualityCacheModel
-                {
-                    Id = Guid.NewGuid(),
-                    ChatId = chatId,
-                    Timestamp = DateTime.UtcNow,
-                    SerializedResponse = JsonConvert.SerializeObject(respMessage),
-                    Radius = 2.0
-                };
-                
                 await _context.AirQualityCacheModels.AddAsync(cachedMessage, token);
                 await _context.SaveChangesAsync(token);
             }
@@ -84,7 +99,7 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
         await _bot.SendMessageAsync(new SendMessageRequest(message.Uid)
         {
             Message = respMessage
-        }, token);
+        }, _options, token);
     }
 
     private static Message? CreateMessage(Message message, Response response, byte[] image)
@@ -110,7 +125,7 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
             return new Response
             {
                 IsSuccess = false,
-                Error = "Вы не ввели свою геолокацию",
+                Error = "Please, enter your geolocation",
                 Latitude = 0,
                 Longitude = 0,
                 GenerationtimeMs = 0,

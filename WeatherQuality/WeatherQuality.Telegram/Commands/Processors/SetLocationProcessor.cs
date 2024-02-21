@@ -13,10 +13,8 @@ public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
     private readonly WeatherQualityContext _context;
     
     public SetLocationProcessor(ILogger<SetLocationProcessor> logger, ICommandValidator<SetLocationCommand> validator, MetricsProcessor metricsProcessor, WeatherQualityContext context) 
-        : base(logger, validator, metricsProcessor)
-    {
-        _context = context;
-    }
+        : base(logger, validator, metricsProcessor) =>
+            _context = context;
 
     protected override async Task InnerProcessContact(Message message, string args, CancellationToken token)
     {
@@ -28,15 +26,24 @@ public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
 
     protected override async Task InnerProcessLocation(Message message, string args, CancellationToken token)
     {
-        var entity = await _context.UserLocationModels.FirstOrDefaultAsync(e => e.ChatId == message.ChatIds.FirstOrDefault(), 
-            cancellationToken: token);
+        var entity = await _context
+                           .UserLocationModels
+                           .FirstOrDefaultAsync(e => e.ChatId ==
+                                                     message
+                                                             .ChatIds
+                                                             .FirstOrDefault(),
+                                                token);
+
         if (entity == null)
-            await _context.UserLocationModels.AddAsync(new UserLocationModel()
-            {
-                ChatId = message.ChatIds.FirstOrDefault(),
-                Longitude = message.Location?.Longitude,
-                Latitude = message.Location?.Latitude
-            }, token);
+        {
+            await _context.UserLocationModels.AddAsync(new UserLocationModel
+                                                       {
+                                                           ChatId = message.ChatIds.FirstOrDefault(),
+                                                           Longitude = message.Location?.Longitude,
+                                                           Latitude = message.Location?.Latitude
+                                                       },
+                                                       token);
+        }
         else
         {
             entity.Latitude = message.Location?.Latitude;

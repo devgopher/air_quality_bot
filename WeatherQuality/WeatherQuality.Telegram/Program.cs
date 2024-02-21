@@ -40,6 +40,7 @@ builder.Services
     .AddBotCommand<StopCommand, StopCommandProcessor, PassValidator<StopCommand>>()
     .AddBotCommand<GetAirQualityCommand, GetAirQualityProcessor, PassValidator<GetAirQualityCommand>>()
     .AddBotCommand<SetLocationCommand, SetLocationProcessor, PassValidator<SetLocationCommand>>()
+    .AddBotCommand<DetailsCommand, DetailsProcessor, PassValidator<DetailsCommand>>()
     .AddDbContext<WeatherQualityContext>(c => c.UseNpgsql(settings!.DbConnectionString));
 // builder.ApplyMigrations<WeatherQualityContext>();
 
@@ -47,6 +48,7 @@ var app = builder.Build();
 app.Services.RegisterBotCommand<StartCommand, StartCommandProcessor, TelegramBot>()
     .RegisterBotCommand<StopCommand, StopCommandProcessor, TelegramBot>()
     .RegisterBotCommand<GetAirQualityCommand, GetAirQualityProcessor, TelegramBot>()
-    .RegisterBotCommand<SetLocationCommand, SetLocationProcessor, TelegramBot>();
+    .RegisterBotCommand<SetLocationCommand, SetLocationProcessor, TelegramBot>()
+    .RegisterBotCommand<DetailsCommand, DetailsProcessor, TelegramBot>();
 
 app.Run();
