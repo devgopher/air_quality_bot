@@ -1,8 +1,8 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace WeatherQuality.Telegram.Database.Models;
+namespace WeatherQuality.Infrastructure.Models;
 
-public class AirQualityCacheModel
+public class AirQualityCacheDetailsModel
 {
     [Key]
     public Guid Id { get; set; }
@@ -14,5 +14,5 @@ public class AirQualityCacheModel
     /// <summary>
     /// Radius in km
     /// </summary>
-    public double Radius { get; set; } = 2.0;
+    public double Radius { get; set; } = 2.0;   
 }

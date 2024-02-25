@@ -14,8 +14,9 @@ public class Request
     public decimal? Latitude { get; set; }
     [JsonProperty("longitude")]
     public decimal? Longitude { get; set; }
+
     [JsonProperty("current")]
-    public string Current { get; set; } = "european_aqi";
+    public List<string> Current { get; set; } = new() {"european_aqi"};
 
     [JsonProperty("hourly")]
     public string Hourly =

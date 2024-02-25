@@ -11,22 +11,26 @@ using SixLabors.ImageSharp;
 using Telegram.Bot.Types.ReplyMarkups;
 using WeatherQuality.Domain.Request;
 using WeatherQuality.Domain.Response;
+using WeatherQuality.Infrastructure;
+using WeatherQuality.Infrastructure.Models;
 using WeatherQuality.Integration;
-using WeatherQuality.Telegram.Database;
-using WeatherQuality.Telegram.Database.Models;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
 
 public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
 {
     private readonly IIntegration _integration;
-    private readonly WeatherQualityContext _context;
     private readonly SendOptionsBuilder<ReplyMarkupBase> _options;
+    private readonly GeoCacheExplorer _geoCacheExplorer;
+    private readonly WeatherQualityContext _context;
     
     public GetAirQualityProcessor(ILogger<GetAirQualityProcessor> logger, ICommandValidator<GetAirQualityCommand> validator,
-        MetricsProcessor metricsProcessor, IIntegration integration, WeatherQualityContext context) : base(logger, validator, metricsProcessor)
+        MetricsProcessor metricsProcessor, IIntegration integration,
+        GeoCacheExplorer geoCacheExplorer,
+        WeatherQualityContext context) : base(logger, validator, metricsProcessor)
     {
         _integration = integration;
+        _geoCacheExplorer = geoCacheExplorer;
         _context = context;
         _options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
                                                                      {
@@ -58,10 +62,71 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
     protected override async Task InnerProcess(Message message, string args, CancellationToken token)
     {
         Message? respMessage;
+        var location = _context.UserLocationModels.FirstOrDefault(um => message.ChatIds.Contains(um.ChatId));
+        var elements = new List<string>()
+        {
+            "european_aqi"
+        };
 
-        var cached = await _context.AirQualityCacheModels
-            .FirstOrDefaultAsync(c => message.ChatIds.Contains(c.ChatId) &&
-                                      DateTime.UtcNow - c.Timestamp < TimeSpan.FromHours(1), token);
+        // Get available info from cache
+        var cachedItems = elements.Select(async e => await _geoCacheExplorer.UpsertToCacheAsync(e,
+                                                                                                (decimal) location.Latitude,
+                                                                                                (decimal) location.Longitude,
+                                                                                                (decimal) 2.0,
+                                                                                                1.0,
+                                                                                                null!,
+                                                                                                token));
+        
+        // Requiring needed values from source
+        var nullCacheValues = await Task.WhenAll(cachedItems.ToList());
+
+
+        Response response = null;
+        if (nullCacheValues.Any())
+        {
+            response = await _integration.GetAirQualityAsync(new Request
+            {
+                Latitude = location.Latitude,
+                Longitude = location.Longitude,
+                Current = nullCacheValues.Select(v => v.ElementName).ToList(),
+                Hourly = null,
+                Timezone = null
+            });
+            
+            // caching non-cached data
+            await _geoCacheExplorer.UpsertToCacheAsync(response.ElementName,
+                                                           value.Latitude,
+                                                           value.Longitude,
+                                                           (decimal) 2.0,
+                                                           1.0,
+                                                           value.Value);
+        }
+        else
+        {
+            response = new Response
+            {
+                IsSuccess = true,
+                Error = string.Empty,
+                Latitude = (double) location.Latitude,
+                Longitude = (double) location.Longitude,
+                GenerationtimeMs = 0,
+                UtcOffsetSeconds = 0,
+                Timezone = null,
+                TimezoneAbbreviation = null,
+                Elevation = 0,
+                HourlyUnits = null,
+                Hourly = new Hourly(),
+                Current = new Current()
+            };
+        }
+
+        // mixing up cached and non-cached data
+
+
+
+
+        .FirstOrDefaultAsync(c => message.ChatIds.Contains(c.ChatId) &&
+                                  DateTime.UtcNow - c.Timestamp < TimeSpan.FromHours(1), token);
         if (cached != null)
         {
             respMessage = JsonConvert.DeserializeObject<Message>(cached.SerializedResponse, new JsonSerializerSettings()
@@ -86,7 +151,7 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
             if (string.IsNullOrWhiteSpace(response.Error))
             {
                 foreach (var cachedMessage in message.ChatIds.Select(chatId
-                                                                             => new AirQualityCacheModel
+                                                                             => new GeoCacheModel
                                                                              {
                                                                                  Id = Guid.NewGuid(),
                                                                                  ChatId = chatId,
@@ -95,7 +160,7 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
                                                                                  Radius = 2.0
                                                                              }))
                 {
-                    await _context.AirQualityCacheModels.AddAsync(cachedMessage, token);
+                    await _context.GeoCacheModels.AddAsync(cachedMessage, token);
                     await _context.SaveChangesAsync(token);
                 }
             }
@@ -129,37 +194,6 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
             };
         
         return respMessage;
-    }
-
-    private async Task<Response> GetQuality(Message message)
-    {
-        var record = _context.UserLocationModels.FirstOrDefault(l => message.ChatIds.Contains(l.ChatId));
-        if (record == default)
-            return new Response
-            {
-                IsSuccess = false,
-                Error = "Please, enter your geolocation",
-                Latitude = 0,
-                Longitude = 0,
-                GenerationtimeMs = 0,
-                UtcOffsetSeconds = 0,
-                Timezone = null,
-                TimezoneAbbreviation = null,
-                Elevation = 0,
-                HourlyUnits = null,
-                Hourly = null,
-                Current = null
-            };
-
-        var response = await _integration.GetAirQualityAsync(new Request
-        {
-            Latitude = record.Latitude,
-            Longitude = record.Longitude,
-            Current = "european_aqi",
-            Hourly = "european_aqi"
-        });
-        
-        return response;
     }
 
     private static byte[]? GenerateImage(Response response, string path)

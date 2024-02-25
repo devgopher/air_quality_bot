@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace WeatherQuality.Telegram.Database.Models;
+namespace WeatherQuality.Infrastructure.Models;
 
 public class UserLocationModel
 {

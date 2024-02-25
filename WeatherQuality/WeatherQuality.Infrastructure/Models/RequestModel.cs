@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using WeatherQuality.Domain.Response;
 
-namespace WeatherQuality.Telegram.Database.Models;
+namespace WeatherQuality.Infrastructure.Models;
 
 public class RequestModel
 {
@@ -9,7 +8,7 @@ public class RequestModel
     public Guid Id { get; set; }
     public decimal? Latitude { get; set; }
     public decimal? Longitude { get; set; }
-    public string Current { get; set; }
-    public string Hourly { get; set; }
+    public List<string> Current { get; set; }
+    public List<string>  Hourly { get; set; }
     public string Timezone { get; set; }
 }

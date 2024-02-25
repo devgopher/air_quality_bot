@@ -3,8 +3,8 @@ using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
 using Botticelli.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
-using WeatherQuality.Telegram.Database;
-using WeatherQuality.Telegram.Database.Models;
+using WeatherQuality.Infrastructure;
+using WeatherQuality.Infrastructure.Models;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
 

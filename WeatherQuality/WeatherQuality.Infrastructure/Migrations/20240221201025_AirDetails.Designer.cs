@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using WeatherQuality.Telegram.Database;
+using WeatherQuality.Infrastructure;
 
 #nullable disable
 
 namespace WeatherQuality.Telegram.Migrations
 {
     [DbContext(typeof(WeatherQualityContext))]
-    [Migration("20240217162501_cache_model_update")]
-    partial class cache_model_update
+    [Migration("20240221201025_AirDetails")]
+    partial class AirDetails
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,15 +35,12 @@ namespace WeatherQuality.Telegram.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<byte[]>("Image")
+                    b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasColumnType("bytea");
+                        .HasColumnType("text");
 
                     b.Property<double>("Radius")
                         .HasColumnType("double precision");
-
-                    b.Property<Guid>("RequestModelId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("SerializedResponse")
                         .IsRequired()
@@ -54,9 +51,11 @@ namespace WeatherQuality.Telegram.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RequestModelId");
-
                     b.ToTable("AirQualityCacheModels");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("AirQualityCacheModel");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("WeatherQuality.Telegram.Database.Models.RequestModel", b =>
@@ -104,15 +103,11 @@ namespace WeatherQuality.Telegram.Migrations
                     b.ToTable("UserLocationModels");
                 });
 
-            modelBuilder.Entity("WeatherQuality.Telegram.Database.Models.AirQualityCacheModel", b =>
+            modelBuilder.Entity("WeatherQuality.Telegram.Database.Models.AirQualityCacheDetailsModel", b =>
                 {
-                    b.HasOne("WeatherQuality.Telegram.Database.Models.RequestModel", "RequestModel")
-                        .WithMany()
-                        .HasForeignKey("RequestModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasBaseType("WeatherQuality.Telegram.Database.Models.AirQualityCacheModel");
 
-                    b.Navigation("RequestModel");
+                    b.HasDiscriminator().HasValue("AirQualityCacheDetailsModel");
                 });
 #pragma warning restore 612, 618
         }

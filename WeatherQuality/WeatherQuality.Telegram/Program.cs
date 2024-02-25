@@ -7,11 +7,11 @@ using Botticelli.Framework.Telegram.Extensions;
 using Botticelli.Framework.Telegram.Options;
 using Microsoft.EntityFrameworkCore;
 using NLog.Extensions.Logging;
+using WeatherQuality.Infrastructure;
 using WeatherQuality.Integration;
 using WeatherQuality.Telegram;
 using WeatherQuality.Telegram.Commands;
 using WeatherQuality.Telegram.Commands.Processors;
-using WeatherQuality.Telegram.Database;
 using WeatherQuality.Telegram.Settings;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using WeatherQuality.Telegram.Database;
+using WeatherQuality.Infrastructure;
 
 #nullable disable
 
 namespace WeatherQuality.Telegram.Migrations
 {
     [DbContext(typeof(WeatherQualityContext))]
-    [Migration("20240214085452_chat_id_string")]
-    partial class chat_id_string
+    [Migration("20240217171029_cache_model_cleanup")]
+    partial class cache_model_cleanup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,18 +31,21 @@ namespace WeatherQuality.Telegram.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("ChatId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<double>("Radius")
                         .HasColumnType("double precision");
 
-                    b.Property<Guid?>("RequestModelId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("SerializedResponse")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RequestModelId");
 
                     b.ToTable("AirQualityCacheModels");
                 });
@@ -90,15 +93,6 @@ namespace WeatherQuality.Telegram.Migrations
                     b.HasKey("ChatId");
 
                     b.ToTable("UserLocationModels");
-                });
-
-            modelBuilder.Entity("WeatherQuality.Telegram.Database.Models.AirQualityCacheModel", b =>
-                {
-                    b.HasOne("WeatherQuality.Telegram.Database.Models.RequestModel", "RequestModel")
-                        .WithMany()
-                        .HasForeignKey("RequestModelId");
-
-                    b.Navigation("RequestModel");
                 });
 #pragma warning restore 612, 618
         }

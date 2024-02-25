@@ -4,12 +4,14 @@ using Botticelli.Framework.Commands.Validators;
 using Botticelli.Shared.API.Client.Requests;
 using Botticelli.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using WeatherQuality.Domain.Request;
 using WeatherQuality.Domain.Response;
+using WeatherQuality.Infrastructure;
+using WeatherQuality.Infrastructure.Models;
 using WeatherQuality.Integration;
-using WeatherQuality.Telegram.Database;
-using WeatherQuality.Telegram.Database.Models;
+using WeatherQuality.Telegram.Settings;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
 
@@ -17,15 +19,21 @@ public class DetailsProcessor : CommandProcessor<DetailsCommand>
 {
     private readonly IIntegration _integration;
     private readonly WeatherQualityContext _context;
+    private readonly IOptionsMonitor<WeatherQualitySettings> _settings;
+    private readonly GeoCacheExplorer _geoCacheExplorer;
 
     public DetailsProcessor(ILogger<DetailsProcessor> logger,
                             ICommandValidator<DetailsCommand> validator,
                             MetricsProcessor metricsProcessor,
                             IIntegration integration,
-                            WeatherQualityContext context) : base(logger, validator, metricsProcessor)
+                            WeatherQualityContext context,
+                            IOptionsMonitor<WeatherQualitySettings> settings,
+                            GeoCacheExplorer geoCacheExplorer) : base(logger, validator, metricsProcessor)
     {
         _integration = integration;
         _context = context;
+        _settings = settings;
+        _geoCacheExplorer = geoCacheExplorer;
     }
 
     protected override Task InnerProcessContact(Message message, string args, CancellationToken token) => throw new NotImplementedException();
@@ -38,10 +46,8 @@ public class DetailsProcessor : CommandProcessor<DetailsCommand>
     {
         Message? respMessage;
 
-        var cached = await _context.AirQualityCacheDetailsModels
-                                   .FirstOrDefaultAsync(c => message.ChatIds.Contains(c.ChatId) &&
-                                                             DateTime.UtcNow - c.Timestamp < TimeSpan.FromHours(1),
-                                                        token);
+        var cached = await _geoCacheExplorer.FindInCacheAsync(
+                                                              _settings.CurrentValue.GeoCachingRadius, token);
 
         if (cached != null)
         {
@@ -57,14 +63,7 @@ public class DetailsProcessor : CommandProcessor<DetailsCommand>
             respMessage = CreateMessage(message, response);
 
             foreach (var cachedMessage in message.ChatIds.Select(chatId
-                                                                         => new AirQualityCacheDetailsModel()
-                                                                         {
-                                                                             Id = Guid.NewGuid(),
-                                                                             ChatId = chatId,
-                                                                             Timestamp = DateTime.UtcNow,
-                                                                             SerializedResponse = JsonConvert.SerializeObject(respMessage),
-                                                                             Radius = 2.0
-                                                                         }))
+                                                                         => MakeCacheElement(chatId, respMessage)))
             {
                 await _context.AirQualityCacheDetailsModels.AddAsync(cachedMessage, token);
                 await _context.SaveChangesAsync(token);
@@ -77,6 +76,16 @@ public class DetailsProcessor : CommandProcessor<DetailsCommand>
                                     },
                                     token);
     }
+
+    private AirQualityCacheDetailsModel MakeCacheElement(string chatId, Message? respMessage) =>
+            new()
+            {
+                Id = Guid.NewGuid(),
+                ChatId = chatId,
+                Timestamp = DateTime.UtcNow,
+                SerializedResponse = JsonConvert.SerializeObject(respMessage),
+                Radius = _settings.CurrentValue.GeoCachingRadius
+            };
 
     private static Message? CreateMessage(Message message, Response response)
     {
@@ -119,7 +128,8 @@ public class DetailsProcessor : CommandProcessor<DetailsCommand>
         {
             Latitude = record.Latitude,
             Longitude = record.Longitude,
-            Current = "carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,aerosol_optical_depth,dust"
+            Current = new List<string>
+                    {"carbon_monoxide", "nitrogen_dioxide", "sulphur_dioxide", "ozone", "aerosol_optical_depth", "dust"}
         });
 
         return response;

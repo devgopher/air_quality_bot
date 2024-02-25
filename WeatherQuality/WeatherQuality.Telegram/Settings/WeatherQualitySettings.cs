@@ -9,4 +9,9 @@ public class WeatherQualitySettings
     public string? SecureStorageConnectionString { get; set; }
     public string? DbConnectionString { get; set; }
     public string? BotName { get; set; }
+
+    /// <summary>
+    /// Radius for geo caching, km (= 0.62 mile)
+    /// </summary>
+    public double GeoCachingRadius { get; set; } = 2.0;
 }
