@@ -17,6 +17,7 @@ public static class ReflectionUtils
                     continue;
                 
                 var propName = jsonAttr.Name;
+
                 var propValue = prop.GetValue(src);
                 
                 if (filterDefaultValues && propValue == default)
@@ -66,17 +67,17 @@ public static class ReflectionUtils
         if (tgt.GetType() != src.GetType())
             return;
 
-        var props = tgt.GetType().GetProperties(BindingFlags.Public);
+        var props = tgt.GetType().GetProperties();
 
         foreach (var prop in props)
         {
             var srcVal = prop.GetValue(src);
-           
-            if (srcVal != default)
-                continue;
+            var tgtVal = prop.GetValue(tgt);  
             
-            var tgtVal = prop.GetValue(tgt);                
-            prop.SetValue(src, tgtVal);
+            if (srcVal != null && srcVal == tgtVal)
+                continue;
+              
+            prop.SetValue(tgt, srcVal);
         }
     }
 }

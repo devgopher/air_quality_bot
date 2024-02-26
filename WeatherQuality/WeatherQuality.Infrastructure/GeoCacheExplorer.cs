@@ -21,12 +21,14 @@ public class GeoCacheExplorer
                                             lat,
                                             longitude,
                                             radius,
-                                            depthInHours,
-                                            token);
+                                            depthInHours);
 
-        if (cached?.SerializedValue is not null) 
+        if (cached != default)
             return cached;
-
+        
+        if (value is null)
+            return default;
+        
         cached = new GeoCacheModel
         {
             Id = Guid.NewGuid(),
@@ -45,20 +47,21 @@ public class GeoCacheExplorer
     }
 
     private async Task<GeoCacheModel?> FindInCacheAsync(string element,
-                                                        decimal lat,
-                                                        decimal longitude,
-                                                        decimal radius,
-                                                        double depthInHours,
-                                                        CancellationToken token) =>
-            await _context.GeoCacheModels
-                          .FirstOrDefaultAsync(c => DateTime.UtcNow - c.Timestamp < TimeSpan.FromHours(depthInHours) &&
-                                                       c.ElementName == element &&
-                                                       CalculateDistance(c.Latitude,
-                                                                         c.Longitude,
-                                                                         lat,
-                                                                         longitude) <
-                                                       radius,
-                                               token);
+        decimal lat,
+        decimal longitude,
+        decimal radius,
+        double depthInHours)
+    {
+        var models = _context.GeoCacheModels
+            .Where(c => DateTime.UtcNow - c.Timestamp < TimeSpan.FromHours(depthInHours) &&
+                        c.ElementName == element)
+            .ToArray();
+
+        return models.FirstOrDefault(c => CalculateDistance(c.Latitude,
+            c.Longitude,
+            lat,
+            longitude) < radius);
+    }
 
     private decimal CalculateDistance(decimal srcLat,
                                      decimal srcLong,

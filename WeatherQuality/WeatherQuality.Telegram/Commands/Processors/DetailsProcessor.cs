@@ -17,8 +17,6 @@ namespace WeatherQuality.Telegram.Commands.Processors;
 
 public class DetailsProcessor : GenericAirQualityProcessor<DetailsCommand>
 {
-    private readonly IOptionsMonitor<WeatherQualitySettings> _settings;
-
     public DetailsProcessor(ILogger<DetailsProcessor> logger,
         ICommandValidator<DetailsCommand> validator,
         MetricsProcessor metricsProcessor,
@@ -28,7 +26,6 @@ public class DetailsProcessor : GenericAirQualityProcessor<DetailsCommand>
         GeoCacheExplorer geoCacheExplorer) : base(logger, validator, metricsProcessor, integration, geoCacheExplorer,
         context)
     {
-        _settings = settings;
     }
 
     protected override Task InnerProcessContact(Message message, string args, CancellationToken token) =>
@@ -43,7 +40,7 @@ public class DetailsProcessor : GenericAirQualityProcessor<DetailsCommand>
     protected override async Task InnerProcess(Message message, string args, CancellationToken token)
     {
         var location = GetLocation(message);
-        var elements = typeof(Current).GetJsonPropertyNames().ToList();
+        var elements = typeof(Current).GetJsonPropertyNames().Where(x => x != "time" && x != "interval").ToList();
         var systemResponse = await ProcessCache(token, elements, location);
         var respMessage = CreateResponseMessage(message, "Main air quality indicators. \n",
             $"\n\nCarbon monoxide: {systemResponse.Current?.CarbonMonoxide} μg/m^3 \n" +

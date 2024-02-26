@@ -11,5 +11,5 @@ public class GeoCacheModel
     public decimal Longitude { get; set; }
     public string ElementName { get; set; }
     public string SerializedValue { get; set; }
-    public byte[] BinaryData { get; set; }
+    public byte[]? BinaryData { get; set; }
 }

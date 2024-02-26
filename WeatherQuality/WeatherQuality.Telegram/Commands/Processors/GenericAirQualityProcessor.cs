@@ -43,10 +43,13 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
 
         // Requiring needed values from source
         var nullCacheValues = cachedItems
-            .Where(c => c is { SerializedValue: null })
+            .Where(c => c != null && c is { SerializedValue: null })
             .ToList();
 
-        var actualCacheValues = cachedItems.Except(nullCacheValues);
+        var actualCacheValues = cachedItems
+            .Except(nullCacheValues)
+            .Where(c =>  c != null && c is not { SerializedValue: null })
+            .ToList();
 
         var cachedResponse = new Response
         {
@@ -60,14 +63,13 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
         foreach (var element in actualCacheValues)
             cachedResponse.Current.SetJsonDeserializedProperty(element.ElementName, element.SerializedValue);
 
-        if (!nullCacheValues.Any())
-            return cachedResponse;
-
+        var elementsToRequest = nullCacheValues.Select(v => v?.ElementName).ToList();
+        
         var request = new Request
         {
             Latitude = location.Latitude,
             Longitude = location.Longitude,
-            Current = nullCacheValues.Select(v => v.ElementName).ToList(),
+            Current = !elementsToRequest.Any() ? elements : elementsToRequest,
             Hourly = string.Empty,
             Timezone = string.Empty
         };
@@ -78,8 +80,11 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
             cachedResponse.Current.MergeByDefaultValues(current);
 
         // caching non-cached data
-        foreach (var element in request.Current.GetJsonProperties())
+        foreach (var element in integrationResponse.Current.GetJsonProperties(true))
         {
+            if (!elements.Contains(element.Key)) 
+                continue;
+            
             var geoCacheModel = await _geoCacheExplorer.UpsertToCacheAsync(element.Key,
                 (decimal)location.Latitude,
                 (decimal)location.Longitude,
@@ -92,7 +97,8 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
                 continue;
 
             // mixing up cached and non-cached data
-            cachedResponse.Current.SetJsonDeserializedProperty(geoCacheModel.ElementName, geoCacheModel.SerializedValue);
+            cachedResponse.Current.SetJsonDeserializedProperty(geoCacheModel.ElementName,
+                geoCacheModel.SerializedValue);
         }
 
         return cachedResponse;
