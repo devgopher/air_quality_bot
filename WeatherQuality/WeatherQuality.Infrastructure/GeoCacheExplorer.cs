@@ -24,7 +24,7 @@ public class GeoCacheExplorer
                                             depthInHours,
                                             token);
 
-        if (cached?.Value is not null) 
+        if (cached?.SerializedValue is not null) 
             return cached;
 
         cached = new GeoCacheModel
@@ -34,7 +34,7 @@ public class GeoCacheExplorer
             Latitude = lat,
             Longitude = longitude,
             ElementName = element,
-            Value = value
+            SerializedValue = value.SerializeToString()!
         };
 
         await _context.AddAsync(cached, token);

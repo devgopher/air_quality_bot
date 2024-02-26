@@ -1,37 +1,27 @@
 ﻿using Botticelli.Client.Analytics;
-using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
 using Botticelli.Framework.SendOptions;
 using Botticelli.Shared.API.Client.Requests;
 using Botticelli.Shared.Constants;
 using Botticelli.Shared.ValueObjects;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using SixLabors.ImageSharp;
 using Telegram.Bot.Types.ReplyMarkups;
-using WeatherQuality.Domain.Request;
 using WeatherQuality.Domain.Response;
 using WeatherQuality.Infrastructure;
-using WeatherQuality.Infrastructure.Models;
 using WeatherQuality.Integration;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
 
-public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
+public class GetAirQualityProcessor : GenericAirQualityProcessor<GetAirQualityCommand>
 {
-    private readonly IIntegration _integration;
     private readonly SendOptionsBuilder<ReplyMarkupBase> _options;
-    private readonly GeoCacheExplorer _geoCacheExplorer;
-    private readonly WeatherQualityContext _context;
+
     
     public GetAirQualityProcessor(ILogger<GetAirQualityProcessor> logger, ICommandValidator<GetAirQualityCommand> validator,
         MetricsProcessor metricsProcessor, IIntegration integration,
         GeoCacheExplorer geoCacheExplorer,
-        WeatherQualityContext context) : base(logger, validator, metricsProcessor)
+        WeatherQualityContext context) : base(logger, validator, metricsProcessor, integration, geoCacheExplorer, context)
     {
-        _integration = integration;
-        _geoCacheExplorer = geoCacheExplorer;
-        _context = context;
         _options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
                                                                      {
                                                                          new[]
@@ -61,139 +51,32 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
 
     protected override async Task InnerProcess(Message message, string args, CancellationToken token)
     {
-        Message? respMessage;
-        var location = _context.UserLocationModels.FirstOrDefault(um => message.ChatIds.Contains(um.ChatId));
+        var location = GetLocation(message);
         var elements = new List<string>()
         {
             "european_aqi"
         };
 
-        // Get available info from cache
-        var cachedItems = elements.Select(async e => await _geoCacheExplorer.UpsertToCacheAsync(e,
-                                                                                                (decimal) location.Latitude,
-                                                                                                (decimal) location.Longitude,
-                                                                                                (decimal) 2.0,
-                                                                                                1.0,
-                                                                                                null!,
-                                                                                                token));
-        
-        // Requiring needed values from source
-        var nullCacheValues = await Task.WhenAll(cachedItems.ToList());
+        var systemResponse = await ProcessCache(token, elements, location);
 
-
-        Response response = null;
-        if (nullCacheValues.Any())
+        var generatedImage = systemResponse.Current?.EuropeanAqi switch
         {
-            response = await _integration.GetAirQualityAsync(new Request
-            {
-                Latitude = location.Latitude,
-                Longitude = location.Longitude,
-                Current = nullCacheValues.Select(v => v.ElementName).ToList(),
-                Hourly = null,
-                Timezone = null
-            });
-            
-            // caching non-cached data
-            await _geoCacheExplorer.UpsertToCacheAsync(response.ElementName,
-                                                           value.Latitude,
-                                                           value.Longitude,
-                                                           (decimal) 2.0,
-                                                           1.0,
-                                                           value.Value);
-        }
-        else
-        {
-            response = new Response
-            {
-                IsSuccess = true,
-                Error = string.Empty,
-                Latitude = (double) location.Latitude,
-                Longitude = (double) location.Longitude,
-                GenerationtimeMs = 0,
-                UtcOffsetSeconds = 0,
-                Timezone = null,
-                TimezoneAbbreviation = null,
-                Elevation = 0,
-                HourlyUnits = null,
-                Hourly = new Hourly(),
-                Current = new Current()
-            };
-        }
+            < 50 => GenerateImage(systemResponse, @"Images\no_pollution.jpg"),
+            >= 50 and < 100 => GenerateImage(systemResponse, @"Images\middle_air_pollution.jpg"),
+            >= 100 => GenerateImage(systemResponse, @"Images\extreme_pollution.jpg"),
+            _ => null
+        };
 
-        // mixing up cached and non-cached data
-
-
-
-
-        .FirstOrDefaultAsync(c => message.ChatIds.Contains(c.ChatId) &&
-                                  DateTime.UtcNow - c.Timestamp < TimeSpan.FromHours(1), token);
-        if (cached != null)
-        {
-            respMessage = JsonConvert.DeserializeObject<Message>(cached.SerializedResponse, new JsonSerializerSettings()
-            {
-                Error = (sender, error) => error.ErrorContext.Handled = true
-            });
-        }
-        else
-        {
-            var response = await GetQuality(message);
-            
-            var generatedImage = response.Current?.EuropeanAqi switch
-            {
-                < 50            => GenerateImage(response, @"Images\no_pollution.jpg"),
-                >= 50 and < 100 => GenerateImage(response, @"Images\middle_air_pollution.jpg"),
-                >=100           => GenerateImage(response, @"Images\extreme_pollution.jpg"),
-                _               => null
-            };
-
-            respMessage = CreateMessage(message, response, generatedImage);
-
-            if (string.IsNullOrWhiteSpace(response.Error))
-            {
-                foreach (var cachedMessage in message.ChatIds.Select(chatId
-                                                                             => new GeoCacheModel
-                                                                             {
-                                                                                 Id = Guid.NewGuid(),
-                                                                                 ChatId = chatId,
-                                                                                 Timestamp = DateTime.UtcNow,
-                                                                                 SerializedResponse = JsonConvert.SerializeObject(respMessage),
-                                                                                 Radius = 2.0
-                                                                             }))
-                {
-                    await _context.GeoCacheModels.AddAsync(cachedMessage, token);
-                    await _context.SaveChangesAsync(token);
-                }
-            }
-        }
+        var respMessage = CreateResponseMessage(message,
+            "AQI in: ",
+            !string.IsNullOrWhiteSpace(systemResponse.Error)
+                ? systemResponse.Error
+                : $"{systemResponse?.Latitude}, {systemResponse?.Longitude}", generatedImage);
 
         await _bot.SendMessageAsync(new SendMessageRequest(message.Uid)
         {
             Message = respMessage
         }, _options, token);
-    }
-
-    private static Message? CreateMessage(Message message, Response response, byte[]? image = null)
-    {
-        var respMessage = new Message
-        {
-            Uid = message.Uid,
-            ChatIds = message.ChatIds,
-            Subject = "AQI in: ",
-            Body = !string.IsNullOrWhiteSpace(response.Error) ? response.Error
-                    : $"{response?.Latitude}, {response?.Longitude}"
-        };
-
-        if (image != null)
-            respMessage.Attachments = new List<IAttachment>()
-            {
-                new BinaryAttachment(Guid.NewGuid().ToString(),
-                                     "air",
-                                     MediaType.Image,
-                                     string.Empty,
-                                     image)
-            };
-        
-        return respMessage;
     }
 
     private static byte[]? GenerateImage(Response response, string path)
