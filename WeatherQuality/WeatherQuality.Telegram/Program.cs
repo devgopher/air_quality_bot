@@ -42,7 +42,8 @@ builder.Services
     .AddBotCommand<GetAirQualityCommand, GetAirQualityProcessor, PassValidator<GetAirQualityCommand>>()
     .AddBotCommand<SetLocationCommand, SetLocationProcessor, PassValidator<SetLocationCommand>>()
     .AddBotCommand<DetailsCommand, DetailsProcessor, PassValidator<DetailsCommand>>()
-    .AddDbContext<WeatherQualityContext>(c => c.UseNpgsql(settings!.DbConnectionString));
+    .AddDbContext<WeatherQualityContext>(c => c.UseNpgsql(settings!.DbConnectionString),
+        ServiceLifetime.Transient);
 // builder.ApplyMigrations<WeatherQualityContext>();
 
 var app = builder.Build();

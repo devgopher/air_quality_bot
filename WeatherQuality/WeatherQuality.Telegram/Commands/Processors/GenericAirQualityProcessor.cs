@@ -16,15 +16,15 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
 {
     private readonly IIntegration _integration;
     private readonly GeoCacheExplorer _geoCacheExplorer;
-    private readonly WeatherQualityContext _context;
+    private readonly IServiceProvider _sp;
 
     protected GenericAirQualityProcessor(ILogger logger,
         ICommandValidator<T> validator, MetricsProcessor metricsProcessor, IIntegration integration,
-        GeoCacheExplorer geoCacheExplorer, WeatherQualityContext context) : base(logger, validator, metricsProcessor)
+        GeoCacheExplorer geoCacheExplorer, IServiceProvider sp) : base(logger, validator, metricsProcessor)
     {
         _integration = integration;
         _geoCacheExplorer = geoCacheExplorer;
-        _context = context;
+        _sp = sp;
     }
 
     protected async Task<Response> ProcessCache(CancellationToken token, List<string> elements,
@@ -43,7 +43,7 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
 
         // Requiring needed values from source
         var nullCacheValues = cachedItems
-            .Where(c => c != null && c is { SerializedValue: null })
+            .Where(c => c is { SerializedValue: null })
             .ToList();
 
         var actualCacheValues = cachedItems
@@ -128,5 +128,9 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
     }
     
     protected UserLocationModel? GetLocation(Message message)
-        => _context.UserLocationModels.FirstOrDefault(um => message.ChatIds.Contains(um.ChatId));
+    {
+        var context = _sp.GetService<WeatherQualityContext>();
+        
+        return context.UserLocationModels.FirstOrDefault(um => message.ChatIds.Contains(um.ChatId));
+    }
 }

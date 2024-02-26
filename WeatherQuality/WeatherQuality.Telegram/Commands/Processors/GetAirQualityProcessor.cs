@@ -20,7 +20,7 @@ public class GetAirQualityProcessor : GenericAirQualityProcessor<GetAirQualityCo
     public GetAirQualityProcessor(ILogger<GetAirQualityProcessor> logger, ICommandValidator<GetAirQualityCommand> validator,
         MetricsProcessor metricsProcessor, IIntegration integration,
         GeoCacheExplorer geoCacheExplorer,
-        WeatherQualityContext context) : base(logger, validator, metricsProcessor, integration, geoCacheExplorer, context)
+        IServiceProvider sp) : base(logger, validator, metricsProcessor, integration, geoCacheExplorer, sp)
     {
         _options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
                                                                      {

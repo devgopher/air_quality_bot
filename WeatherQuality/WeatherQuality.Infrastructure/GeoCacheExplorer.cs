@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Geolocation;
+using Microsoft.EntityFrameworkCore;
 using WeatherQuality.Infrastructure.Models;
 
 namespace WeatherQuality.Infrastructure;
@@ -57,10 +58,12 @@ public class GeoCacheExplorer
                         c.ElementName == element)
             .ToArray();
 
-        return models.FirstOrDefault(c => CalculateDistance(c.Latitude,
+        var nearest= models.FirstOrDefault(c => CalculateDistance(c.Latitude,
             c.Longitude,
             lat,
             longitude) < radius);
+
+        return nearest;
     }
 
     private decimal CalculateDistance(decimal srcLat,
@@ -68,13 +71,6 @@ public class GeoCacheExplorer
                                      decimal tgtLat,
                                      decimal tgtLong)
     {
-        var d1 = srcLat * (decimal) (Math.PI / 180.0);
-        var num1 = srcLong * (decimal) (Math.PI / 180.0);
-        var d2 = tgtLat * (decimal) (Math.PI / 180.0);
-        var num2 = tgtLong * (decimal) (Math.PI / 180.0) - num1;
-        var d3 = Math.Pow(Math.Sin((double) (d2 - d1) / 2.0), 2.0) +
-                 Math.Cos((double) d1) * Math.Cos((double) d2) * Math.Pow(Math.Sin((double) num2 / 2.0), 2.0);
-
-        return (decimal) (6376500.0 * (2.0 * Math.Atan2(Math.Sqrt(d3), Math.Sqrt(1.0 - d3))));
+       return (decimal)GeoCalculator.GetDistance((double)srcLat, (double)srcLong, (double)tgtLat, (double)tgtLong, 1, DistanceUnit.Kilometers);
     }
 }
