@@ -11,19 +11,26 @@ public static class ReflectionUtils
         
         foreach (var prop in src.GetType().GetProperties())
         {
-            foreach (var attr in prop.GetCustomAttributes(true))
+            try
             {
-                if (attr is not JsonPropertyNameAttribute jsonAttr) 
-                    continue;
-                
-                var propName = jsonAttr.Name;
+                foreach (var attr in prop.GetCustomAttributes(true))
+                {
+                    if (attr is not JsonPropertyNameAttribute jsonAttr)
+                        continue;
 
-                var propValue = prop.GetValue(src);
-                
-                if (filterDefaultValues && propValue == default)
-                    continue;
-                
-                dict.Add(propName, propValue);
+                    var propName = jsonAttr.Name;
+
+                    var propValue = prop.GetValue(src);
+
+                    if (filterDefaultValues && propValue == default)
+                        continue;
+
+                    dict.Add(propName, propValue);
+                }
+            }
+            catch (Exception ex)
+            {
+                // TODO: logging...
             }
         }
 

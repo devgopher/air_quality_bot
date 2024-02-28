@@ -1,4 +1,5 @@
-﻿using Flurl;
+﻿using System.Text.Json;
+using Flurl;
 using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using WeatherQuality.Domain.Request;
@@ -27,7 +28,6 @@ public class OpenMeteoIntegration : IIntegration
                 .SetQueryParam("longitude", request.Longitude)
                 .SetQueryParam("current", string.Join(",", request.Current))
                 .GetJsonAsync<Response>();
-
             result.IsSuccess = true;
 
             return result;

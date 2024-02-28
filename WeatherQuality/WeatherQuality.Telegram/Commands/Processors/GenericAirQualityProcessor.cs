@@ -2,8 +2,10 @@
 using Botticelli.Framework.Commands;
 using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
+using Botticelli.Framework.SendOptions;
 using Botticelli.Shared.Constants;
 using Botticelli.Shared.ValueObjects;
+using Telegram.Bot.Types.ReplyMarkups;
 using WeatherQuality.Domain.Request;
 using WeatherQuality.Domain.Response;
 using WeatherQuality.Infrastructure;
@@ -17,6 +19,7 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
     private readonly IIntegration _integration;
     private readonly GeoCacheExplorer _geoCacheExplorer;
     private readonly IServiceProvider _sp;
+    protected  readonly SendOptionsBuilder<ReplyMarkupBase> Options;
 
     protected GenericAirQualityProcessor(ILogger logger,
         ICommandValidator<T> validator, MetricsProcessor metricsProcessor, IIntegration integration,
@@ -25,6 +28,27 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
         _integration = integration;
         _geoCacheExplorer = geoCacheExplorer;
         _sp = sp;
+        Options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
+        {
+            new[]
+            {
+                new KeyboardButton("/Details")
+                {
+                    RequestLocation = false
+                },
+                new KeyboardButton("/GetAirQuality")
+                {
+                    RequestLocation = false
+                },
+                new KeyboardButton("/SetLocation")
+                {
+                    RequestLocation = true
+                }
+            }
+        })
+        {
+            ResizeKeyboard = true
+        });
     }
 
     protected async Task<Response> ProcessCache(CancellationToken token, List<string> elements,

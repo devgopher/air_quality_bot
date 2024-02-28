@@ -14,19 +14,19 @@ public class Response
 
     [JsonPropertyName("latitude")]
     [JsonProperty("latitude")]
-    public double Latitude { get; set; }
+    public double? Latitude { get; set; }
 
     [JsonPropertyName("longitude")]
     [JsonProperty("longitude")]
-    public double Longitude { get; set; }
+    public double? Longitude { get; set; }
 
     [JsonPropertyName("generationtime_ms")]
     [JsonProperty("generationtime_ms")]
-    public double GenerationtimeMs { get; set; }
+    public double? GenerationtimeMs { get; set; }
 
     [JsonPropertyName("utc_offset_seconds")]
     [JsonProperty("utc_offset_seconds")]
-    public int UtcOffsetSeconds { get; set; }
+    public int? UtcOffsetSeconds { get; set; }
 
     [JsonPropertyName("timezone")]
     [JsonProperty("timezone")]
@@ -38,17 +38,17 @@ public class Response
 
     [JsonPropertyName("elevation")]
     [JsonProperty("elevation")]
-    public double Elevation { get; set; }
+    public double? Elevation { get; set; }
 
     [JsonPropertyName("hourly_units")]
     [JsonProperty("hourly_units")]
-    public HourlyUnits HourlyUnits { get; set; }
+    public HourlyUnits? HourlyUnits { get; set; }
 
     [JsonPropertyName("hourly")]
     [JsonProperty("hourly")]
-    public Hourly Hourly { get; set; }
+    public Hourly? Hourly { get; set; }
 
     [JsonPropertyName("current")]
     [JsonProperty("current")]
-    public Current Current { get; set; }
+    public Current? Current { get; set; }
 }

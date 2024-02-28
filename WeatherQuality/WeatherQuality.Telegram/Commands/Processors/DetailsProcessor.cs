@@ -20,7 +20,7 @@ public class DetailsProcessor : GenericAirQualityProcessor<DetailsCommand>
         MetricsProcessor metricsProcessor,
         IIntegration integration,
         GeoCacheExplorer geoCacheExplorer,
-       IServiceProvider sp) : base(logger, validator, metricsProcessor, integration, geoCacheExplorer,
+        IServiceProvider sp) : base(logger, validator, metricsProcessor, integration, geoCacheExplorer,
         sp)
     {
     }
@@ -48,6 +48,6 @@ public class DetailsProcessor : GenericAirQualityProcessor<DetailsCommand>
         await _bot.SendMessageAsync(new SendMessageRequest(message.Uid)
         {
             Message = respMessage
-        }, token);
+        }, Options, token);
     }
 }

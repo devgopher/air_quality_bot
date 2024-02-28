@@ -14,27 +14,11 @@ namespace WeatherQuality.Telegram.Commands.Processors;
 
 public class GetAirQualityProcessor : GenericAirQualityProcessor<GetAirQualityCommand>
 {
-    private readonly SendOptionsBuilder<ReplyMarkupBase> _options;
-
-    
     public GetAirQualityProcessor(ILogger<GetAirQualityProcessor> logger, ICommandValidator<GetAirQualityCommand> validator,
         MetricsProcessor metricsProcessor, IIntegration integration,
         GeoCacheExplorer geoCacheExplorer,
         IServiceProvider sp) : base(logger, validator, metricsProcessor, integration, geoCacheExplorer, sp)
     {
-        _options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
-                                                                     {
-                                                                         new[]
-                                                                         {
-                                                                             new KeyboardButton("/Details")
-                                                                             {
-                                                                                 RequestLocation = false
-                                                                             }
-                                                                         }
-                                                                     })
-                                                                     {
-                                                                         ResizeKeyboard = true
-                                                                     });
     }
 
     protected override async Task InnerProcessContact(Message message, string args, CancellationToken token)
@@ -76,7 +60,7 @@ public class GetAirQualityProcessor : GenericAirQualityProcessor<GetAirQualityCo
         await _bot.SendMessageAsync(new SendMessageRequest(message.Uid)
         {
             Message = respMessage
-        }, _options, token);
+        }, Options, token);
     }
 
     private static byte[]? GenerateImage(Response response, string path)
