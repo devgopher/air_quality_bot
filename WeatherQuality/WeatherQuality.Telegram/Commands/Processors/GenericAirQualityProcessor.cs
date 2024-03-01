@@ -5,6 +5,7 @@ using Botticelli.Framework.Commands.Validators;
 using Botticelli.Framework.SendOptions;
 using Botticelli.Shared.Constants;
 using Botticelli.Shared.ValueObjects;
+using EmergencyServicesWorldwideBot.Interaction.OSM;
 using Microsoft.Extensions.Options;
 using Telegram.Bot.Types.ReplyMarkups;
 using WeatherQuality.Domain.Request;
@@ -18,21 +19,24 @@ namespace WeatherQuality.Telegram.Commands.Processors;
 
 public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where T : class, ICommand
 {
-    protected readonly IOptionsSnapshot<WeatherQualitySettings> _settings;
+    protected readonly IOptionsSnapshot<WeatherQualitySettings> Settings;
     private readonly IIntegration _integration;
     private readonly GeoCacheExplorer _geoCacheExplorer;
     private readonly IServiceProvider _sp;
-    protected  readonly SendOptionsBuilder<ReplyMarkupBase> Options;
+    protected readonly ILocationService LocationService;
+    protected readonly SendOptionsBuilder<ReplyMarkupBase> Options;
 
     protected GenericAirQualityProcessor(ILogger logger,
         IOptionsSnapshot<WeatherQualitySettings> settings,
         ICommandValidator<T> validator, MetricsProcessor metricsProcessor, IIntegration integration,
-        GeoCacheExplorer geoCacheExplorer, IServiceProvider sp) : base(logger, validator, metricsProcessor)
+        GeoCacheExplorer geoCacheExplorer, IServiceProvider sp, ILocationService locationService) : base(logger,
+        validator, metricsProcessor)
     {
-        _settings = settings;
+        Settings = settings;
         _integration = integration;
         _geoCacheExplorer = geoCacheExplorer;
         _sp = sp;
+        LocationService = locationService;
         Options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
         {
             new[]
@@ -64,8 +68,8 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
         var cachedItemsQuery = elements.Select(async e => await _geoCacheExplorer.UpsertToCacheAsync(e,
             location.Latitude,
             location.Longitude,
-            _settings.Value?.GeoCachingRadius ?? 5.0,
-            _settings.Value?.CachingPeriod ?? 2.0,
+            Settings.Value?.GeoCachingRadius ?? 5.0,
+            Settings.Value?.CachingPeriod ?? 2.0,
             null!,
             token));
 
@@ -78,7 +82,7 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
 
         var actualCacheValues = cachedItems
             .Except(nullCacheValues)
-            .Where(c =>  c != null && c is not { SerializedValue: null })
+            .Where(c => c != null && c is not { SerializedValue: null })
             .ToList();
 
         var cachedResponse = new Response
@@ -94,7 +98,7 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
             cachedResponse.Current.SetJsonDeserializedProperty(element.ElementName, element.SerializedValue);
 
         var elementsToRequest = nullCacheValues.Select(v => v?.ElementName).ToList();
-        
+
         var request = new Request
         {
             Latitude = location.Latitude,
@@ -112,14 +116,14 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
         // caching non-cached data
         foreach (var element in integrationResponse.Current.GetJsonProperties(true))
         {
-            if (!elements.Contains(element.Key)) 
+            if (!elements.Contains(element.Key))
                 continue;
-            
+
             var geoCacheModel = await _geoCacheExplorer.UpsertToCacheAsync(element.Key,
                 location.Latitude,
                 location.Longitude,
-                _settings.Value?.GeoCachingRadius ?? 5.0,
-                _settings.Value?.CachingPeriod ?? 2.0,
+                Settings.Value?.GeoCachingRadius ?? 5.0,
+                Settings.Value?.CachingPeriod ?? 2.0,
                 element.Value,
                 token);
 
@@ -153,14 +157,14 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
                     string.Empty,
                     image)
             };
-        
+
         return respMessage;
     }
-    
+
     protected UserLocationModel? GetLocation(Message message)
     {
         var context = _sp.GetService<WeatherQualityContext>();
-        
+
         return context.UserLocationModels.FirstOrDefault(um => message.ChatIds.Contains(um.ChatId));
     }
 }

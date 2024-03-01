@@ -19,4 +19,9 @@ public class WeatherQualitySettings
     /// Caching period in hours
     /// </summary>
     public double CachingPeriod { get; set; } = 1.0;
+
+    /// <summary>
+    /// Criterias
+    /// </summary>
+    public List<MetricCriteria> Criteria { get; set; }
 }

@@ -5,6 +5,8 @@ using Botticelli.Framework.Options;
 using Botticelli.Framework.Telegram;
 using Botticelli.Framework.Telegram.Extensions;
 using Botticelli.Framework.Telegram.Options;
+using EmergencyServicesWorldwideBot.Interaction.OSM;
+using EmergencyServicesWorldwideBot.Interaction.OSM.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NLog.Extensions.Logging;
 using WeatherQuality.Infrastructure;
@@ -37,6 +39,7 @@ builder.Services
     .AddScoped<StartCommandProcessor>()
     .AddScoped<StopCommandProcessor>()
     .AddScoped<GeoCacheExplorer>()
+    .AddLocationService()
     .AddBotCommand<StartCommand, StartCommandProcessor, PassValidator<StartCommand>>()
     .AddBotCommand<StopCommand, StopCommandProcessor, PassValidator<StopCommand>>()
     .AddBotCommand<GetAirQualityCommand, GetAirQualityProcessor, PassValidator<GetAirQualityCommand>>()

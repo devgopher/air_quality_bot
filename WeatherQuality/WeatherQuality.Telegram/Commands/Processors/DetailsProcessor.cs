@@ -3,6 +3,7 @@ using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
 using Botticelli.Shared.API.Client.Requests;
 using Botticelli.Shared.ValueObjects;
+using EmergencyServicesWorldwideBot.Interaction.OSM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -23,8 +24,8 @@ public class DetailsProcessor : GenericAirQualityProcessor<DetailsCommand>
         MetricsProcessor metricsProcessor,
         IIntegration integration,
         GeoCacheExplorer geoCacheExplorer,
-        IServiceProvider sp) : base(logger, settings, validator, metricsProcessor, integration, geoCacheExplorer,
-        sp)
+        IServiceProvider sp, ILocationService locationService) : base(logger, settings, validator, metricsProcessor,
+        integration, geoCacheExplorer, sp, locationService)
     {
     }
 
