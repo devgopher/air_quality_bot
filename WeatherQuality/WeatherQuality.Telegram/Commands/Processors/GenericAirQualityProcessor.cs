@@ -138,7 +138,7 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
         return cachedResponse;
     }
 
-    protected static Message? CreateResponseMessage(Message message, string subj, string body, byte[]? image = null)
+    protected static Message? CreateResponseMessage(Message message, string subj, string? body, byte[]? image = null)
     {
         var respMessage = new Message
         {

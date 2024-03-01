@@ -16,13 +16,18 @@ namespace EmergencyServicesWorldwideBot.Interaction.OSM;
 
 public class OsmLocationService : ILocationService
 {
-    private readonly ILogger<OsmLocationService> _logger;
+    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
 
-    public OsmLocationService(ILogger<OsmLocationService> logger, IHttpClientFactory? httpClientFactory)
+    public OsmLocationService(ILogger logger, IHttpClientFactory? httpClientFactory)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
+    }
+
+    public OsmLocationService(ILogger<OsmLocationService> logger, IHttpClientFactory? httpClientFactory)
+        : this((ILogger)logger, httpClientFactory)
+    {
     }
 
     public async Task<string?> GetCountry(double lat, double lng)

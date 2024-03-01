@@ -10,7 +10,7 @@ public class Response
 {
     public bool IsSuccess { get; set; }
 
-    public string Error { get; set; }
+    public string? Error { get; set; }
 
     [JsonPropertyName("latitude")]
     [JsonProperty("latitude")]

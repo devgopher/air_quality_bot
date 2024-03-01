@@ -5,8 +5,8 @@ using Botticelli.Framework.Options;
 using Botticelli.Framework.Telegram;
 using Botticelli.Framework.Telegram.Extensions;
 using Botticelli.Framework.Telegram.Options;
-using EmergencyServicesWorldwideBot.Interaction.OSM;
 using EmergencyServicesWorldwideBot.Interaction.OSM.Extensions;
+using EmergencyServicesWorldwideBot.Interaction.OSM.Settings;
 using Microsoft.EntityFrameworkCore;
 using NLog.Extensions.Logging;
 using WeatherQuality.Infrastructure;
@@ -22,10 +22,9 @@ var settings = builder.Configuration
     .GetSection(nameof(WeatherQualitySettings))
     .Get<WeatherQualitySettings>();
 
-
-
 builder.Services
     .Configure<WeatherQualitySettings>(builder.Configuration.GetSection(nameof(WeatherQualitySettings)))
+    .Configure<LocationCacheSettings>(builder.Configuration.GetSection(nameof(LocationCacheSettings)))
     .AddTelegramBot(builder.Configuration,
         new BotOptionsBuilder<TelegramBotSettings>()
             .Set(s => s.SecureStorageSettings = new SecureStorageSettings
@@ -39,7 +38,7 @@ builder.Services
     .AddScoped<StartCommandProcessor>()
     .AddScoped<StopCommandProcessor>()
     .AddScoped<GeoCacheExplorer>()
-    .AddLocationService()
+    .AddCachedLocationService()
     .AddBotCommand<StartCommand, StartCommandProcessor, PassValidator<StartCommand>>()
     .AddBotCommand<StopCommand, StopCommandProcessor, PassValidator<StopCommand>>()
     .AddBotCommand<GetAirQualityCommand, GetAirQualityProcessor, PassValidator<GetAirQualityCommand>>()
