@@ -11,9 +11,9 @@ namespace WeatherQuality.Domain.Request;
 public class Request
 {
     [JsonProperty("latitude")]
-    public decimal? Latitude { get; set; }
+    public double? Latitude { get; set; }
     [JsonProperty("longitude")]
-    public decimal? Longitude { get; set; }
+    public double? Longitude { get; set; }
 
     [JsonProperty("current")]
     public List<string> Current { get; set; } = new() {"european_aqi"};

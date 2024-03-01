@@ -7,8 +7,8 @@ public class GeoCacheModel
     [Key]
     public Guid Id { get; set; }
     public DateTime Timestamp { get; set; }
-    public decimal Latitude { get; set; }
-    public decimal Longitude { get; set; }
+    public float Latitude { get; set; }
+    public float Longitude { get; set; }
     public string ElementName { get; set; }
     public string SerializedValue { get; set; }
     public byte[]? BinaryData { get; set; }

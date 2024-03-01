@@ -11,9 +11,9 @@ public class GeoCacheExplorer
     public GeoCacheExplorer(WeatherQualityContext context) => _context = context;
 
     public async Task<GeoCacheModel?> UpsertToCacheAsync(string element,
-                                                         decimal lat,
-                                                         decimal longitude,
-                                                         decimal radius,
+        double lat,
+                                                         double longitude,
+                                                         double radius,
                                                          double depthInHours,
                                                          object value,
                                                          CancellationToken token)
@@ -34,8 +34,8 @@ public class GeoCacheExplorer
         {
             Id = Guid.NewGuid(),
             Timestamp = DateTime.UtcNow,
-            Latitude = lat,
-            Longitude = longitude,
+            Latitude = (float)lat,
+            Longitude = (float)longitude,
             ElementName = element,
             SerializedValue = value.SerializeToString()!
         };
@@ -48,9 +48,9 @@ public class GeoCacheExplorer
     }
 
     private async Task<GeoCacheModel?> FindInCacheAsync(string element,
-        decimal lat,
-        decimal longitude,
-        decimal radius,
+        double lat,
+        double longitude,
+        double radius,
         double depthInHours)
     {
         var models = _context.GeoCacheModels
@@ -66,11 +66,11 @@ public class GeoCacheExplorer
         return nearest;
     }
 
-    private decimal CalculateDistance(decimal srcLat,
-                                     decimal srcLong,
-                                     decimal tgtLat,
-                                     decimal tgtLong)
+    private double CalculateDistance(double srcLat,
+        double srcLong,
+        double tgtLat,
+        double tgtLong)
     {
-       return (decimal)GeoCalculator.GetDistance((double)srcLat, (double)srcLong, (double)tgtLat, (double)tgtLong, 1, DistanceUnit.Kilometers);
+       return GeoCalculator.GetDistance(srcLat, srcLong, tgtLat, tgtLong, 1, DistanceUnit.Kilometers);
     }
 }

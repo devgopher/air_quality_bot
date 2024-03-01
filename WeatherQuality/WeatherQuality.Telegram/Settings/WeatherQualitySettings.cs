@@ -14,4 +14,9 @@ public class WeatherQualitySettings
     /// Radius for geo caching, km (= 0.62 mile)
     /// </summary>
     public double GeoCachingRadius { get; set; } = 2.0;
+    
+    /// <summary>
+    /// Caching period in hours
+    /// </summary>
+    public double CachingPeriod { get; set; } = 1.0;
 }

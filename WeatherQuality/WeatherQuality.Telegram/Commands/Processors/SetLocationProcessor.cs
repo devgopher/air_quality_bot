@@ -42,16 +42,16 @@ public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
         {
             await _context.UserLocationModels.AddAsync(new UserLocationModel
                                                        {
-                                                           ChatId = message.ChatIds.FirstOrDefault(),
-                                                           Longitude = message.Location?.Longitude,
-                                                           Latitude = message.Location?.Latitude
+                                                           ChatId = message.ChatIds.FirstOrDefault()!,
+                                                           Longitude = (float)message.Location?.Longitude!,
+                                                           Latitude = (float)message.Location?.Latitude!
                                                        },
                                                        token);
         }
         else
         {
-            entity.Latitude = message.Location?.Latitude;
-            entity.Longitude = message.Location?.Longitude;
+            entity.Latitude = (float)message.Location?.Latitude!;
+            entity.Longitude = (float)message.Location?.Longitude!;
 
             _context.Update(entity);
         }

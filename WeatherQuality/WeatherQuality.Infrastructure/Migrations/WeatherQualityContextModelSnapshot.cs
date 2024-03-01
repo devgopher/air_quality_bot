@@ -36,11 +36,11 @@ namespace WeatherQuality.Telegram.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("Latitude")
-                        .HasColumnType("numeric");
+                    b.Property<float>("Latitude")
+                        .HasColumnType("real");
 
-                    b.Property<decimal>("Longitude")
-                        .HasColumnType("numeric");
+                    b.Property<float>("Longitude")
+                        .HasColumnType("real");
 
                     b.Property<string>("SerializedValue")
                         .IsRequired()
@@ -88,11 +88,11 @@ namespace WeatherQuality.Telegram.Migrations
                     b.Property<string>("ChatId")
                         .HasColumnType("text");
 
-                    b.Property<decimal?>("Latitude")
-                        .HasColumnType("numeric");
+                    b.Property<float>("Latitude")
+                        .HasColumnType("real");
 
-                    b.Property<decimal?>("Longitude")
-                        .HasColumnType("numeric");
+                    b.Property<float>("Longitude")
+                        .HasColumnType("real");
 
                     b.HasKey("ChatId");
 

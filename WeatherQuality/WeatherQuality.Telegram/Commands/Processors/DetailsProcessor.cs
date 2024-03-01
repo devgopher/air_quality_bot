@@ -4,23 +4,26 @@ using Botticelli.Framework.Commands.Validators;
 using Botticelli.Shared.API.Client.Requests;
 using Botticelli.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using WeatherQuality.Domain.Request;
 using WeatherQuality.Domain.Response;
 using WeatherQuality.Infrastructure;
 using WeatherQuality.Infrastructure.Models;
 using WeatherQuality.Integration;
+using WeatherQuality.Telegram.Settings;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
 
 public class DetailsProcessor : GenericAirQualityProcessor<DetailsCommand>
 {
     public DetailsProcessor(ILogger<DetailsProcessor> logger,
+        IOptionsSnapshot<WeatherQualitySettings> settings,
         ICommandValidator<DetailsCommand> validator,
         MetricsProcessor metricsProcessor,
         IIntegration integration,
         GeoCacheExplorer geoCacheExplorer,
-        IServiceProvider sp) : base(logger, validator, metricsProcessor, integration, geoCacheExplorer,
+        IServiceProvider sp) : base(logger, settings, validator, metricsProcessor, integration, geoCacheExplorer,
         sp)
     {
     }

@@ -5,26 +5,31 @@ using Botticelli.Framework.Commands.Validators;
 using Botticelli.Framework.SendOptions;
 using Botticelli.Shared.Constants;
 using Botticelli.Shared.ValueObjects;
+using Microsoft.Extensions.Options;
 using Telegram.Bot.Types.ReplyMarkups;
 using WeatherQuality.Domain.Request;
 using WeatherQuality.Domain.Response;
 using WeatherQuality.Infrastructure;
 using WeatherQuality.Infrastructure.Models;
 using WeatherQuality.Integration;
+using WeatherQuality.Telegram.Settings;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
 
 public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where T : class, ICommand
 {
+    protected readonly IOptionsSnapshot<WeatherQualitySettings> _settings;
     private readonly IIntegration _integration;
     private readonly GeoCacheExplorer _geoCacheExplorer;
     private readonly IServiceProvider _sp;
     protected  readonly SendOptionsBuilder<ReplyMarkupBase> Options;
 
     protected GenericAirQualityProcessor(ILogger logger,
+        IOptionsSnapshot<WeatherQualitySettings> settings,
         ICommandValidator<T> validator, MetricsProcessor metricsProcessor, IIntegration integration,
         GeoCacheExplorer geoCacheExplorer, IServiceProvider sp) : base(logger, validator, metricsProcessor)
     {
+        _settings = settings;
         _integration = integration;
         _geoCacheExplorer = geoCacheExplorer;
         _sp = sp;
@@ -47,7 +52,8 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
             }
         })
         {
-            ResizeKeyboard = true
+            ResizeKeyboard = true,
+            IsPersistent = true
         });
     }
 
@@ -56,10 +62,10 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
     {
         // Get available info from cache
         var cachedItemsQuery = elements.Select(async e => await _geoCacheExplorer.UpsertToCacheAsync(e,
-            (decimal)location.Latitude,
-            (decimal)location.Longitude,
-            (decimal)2.0,
-            1.0,
+            location.Latitude,
+            location.Longitude,
+            _settings.Value?.GeoCachingRadius ?? 5.0,
+            _settings.Value?.CachingPeriod ?? 2.0,
             null!,
             token));
 
@@ -110,10 +116,10 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
                 continue;
             
             var geoCacheModel = await _geoCacheExplorer.UpsertToCacheAsync(element.Key,
-                (decimal)location.Latitude,
-                (decimal)location.Longitude,
-                (decimal)2.0,
-                1.0,
+                location.Latitude,
+                location.Longitude,
+                _settings.Value?.GeoCachingRadius ?? 5.0,
+                _settings.Value?.CachingPeriod ?? 2.0,
                 element.Value,
                 token);
 
