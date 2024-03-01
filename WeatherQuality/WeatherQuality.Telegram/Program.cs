@@ -10,6 +10,7 @@ using NLog.Extensions.Logging;
 using WeatherQuality.Infrastructure;
 using WeatherQuality.Integration;
 using WeatherQuality.Integration.Extensions;
+using WeatherQuality.Integration.Interfaces;
 using WeatherQuality.Integration.Settings;
 using WeatherQuality.Telegram;
 using WeatherQuality.Telegram.Commands;

@@ -2,6 +2,7 @@
 using Nominatim.API.Geocoders;
 using Nominatim.API.Models;
 using Nominatim.API.Web;
+using WeatherQuality.Integration.Interfaces;
 
 namespace WeatherQuality.Integration;
 

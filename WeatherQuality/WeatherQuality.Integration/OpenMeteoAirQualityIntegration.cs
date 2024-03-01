@@ -4,6 +4,7 @@ using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using WeatherQuality.Domain.Request;
 using WeatherQuality.Domain.Response;
+using WeatherQuality.Integration.Interfaces;
 
 namespace WeatherQuality.Integration;
 

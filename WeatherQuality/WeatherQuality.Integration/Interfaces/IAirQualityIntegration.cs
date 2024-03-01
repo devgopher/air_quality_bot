@@ -1,7 +1,7 @@
 using WeatherQuality.Domain.Request;
 using WeatherQuality.Domain.Response;
 
-namespace WeatherQuality.Integration;
+namespace WeatherQuality.Integration.Interfaces;
 
 public interface IAirQualityIntegration
 {

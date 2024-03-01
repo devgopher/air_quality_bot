@@ -7,6 +7,7 @@ using SixLabors.ImageSharp;
 using WeatherQuality.Domain.Response;
 using WeatherQuality.Infrastructure;
 using WeatherQuality.Integration;
+using WeatherQuality.Integration.Interfaces;
 using WeatherQuality.Telegram.Settings;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
@@ -46,7 +47,7 @@ public class GetAirQualityProcessor : GenericAirQualityProcessor<GetAirQualityCo
         var systemResponse = await ProcessCache(token, elements, location);
 
         var aqi = systemResponse.Current?.EuropeanAqi;
-        var decision = Settings.Value.Criteria.SingleOrDefault(c => aqi >= c.LowBorder && aqi < c.HiBorder);
+        var decision = Settings.Value.Criteria?.SingleOrDefault(c => aqi >= c.LowBorder && aqi < c.HiBorder && c.Name == "european_aqi");
         if (decision == default)
             throw new InvalidDataException($"Can't get an appropriate decision for aqi {aqi}! " +
                                            $"Please, check out your configuration ('Criteria' section)!");
@@ -74,14 +75,11 @@ public class GetAirQualityProcessor : GenericAirQualityProcessor<GetAirQualityCo
             $"AQI: {response.Current?.EuropeanAqi}", 200f,
             Color.Red, 200, 50);
 
-        foreach (var recommendation in criteria.Recommendations)
-            image = ImageUtils.PlaceText(image,
-                recommendation,
-                100f,
-                Color.Parse(criteria.Color),
-                200,
-                250 + criteria.Recommendations.IndexOf(recommendation) * 100);
-
-        return image;
+        return criteria.Recommendations.Aggregate(image, (current, recommendation) 
+            => ImageUtils.PlaceText(current, recommendation, 
+                100f, 
+                Color.Parse(criteria.Color), 
+                200, 
+                250 + criteria.Recommendations.IndexOf(recommendation) * 100));
     }
 }

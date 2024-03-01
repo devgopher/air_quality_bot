@@ -5,6 +5,7 @@
 /// </summary>
 public class MetricCriteria
 {
+    public string Name { get; set; }
     public int LowBorder { get; set; }
     public int HiBorder { get; set; }
     public string Text { get; set; }

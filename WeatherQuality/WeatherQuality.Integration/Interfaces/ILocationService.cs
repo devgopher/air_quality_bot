@@ -1,4 +1,4 @@
-﻿namespace WeatherQuality.Integration
+﻿namespace WeatherQuality.Integration.Interfaces
 {
     public interface ILocationService
     {

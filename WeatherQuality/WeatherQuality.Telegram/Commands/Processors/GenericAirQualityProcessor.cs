@@ -12,6 +12,7 @@ using WeatherQuality.Domain.Response;
 using WeatherQuality.Infrastructure;
 using WeatherQuality.Infrastructure.Models;
 using WeatherQuality.Integration;
+using WeatherQuality.Integration.Interfaces;
 using WeatherQuality.Telegram.Settings;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
@@ -113,11 +114,10 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
             cachedResponse.Current.MergeByDefaultValues(current);
 
         // caching non-cached data
-        foreach (var element in integrationResponse.Current.GetJsonProperties(true))
+        foreach (var element in integrationResponse.Current
+                     .GetJsonProperties(true)
+                     .Where(element => elements.Contains(element.Key)))
         {
-            if (!elements.Contains(element.Key))
-                continue;
-
             var geoCacheModel = await _geoCacheExplorer.UpsertToCacheAsync(element.Key,
                 location.Latitude,
                 location.Longitude,

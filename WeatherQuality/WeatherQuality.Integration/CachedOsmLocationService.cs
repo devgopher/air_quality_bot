@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nominatim.API.Models;
+using WeatherQuality.Integration.Interfaces;
 using WeatherQuality.Integration.Settings;
 using IHttpClientFactory = System.Net.Http.IHttpClientFactory;
 

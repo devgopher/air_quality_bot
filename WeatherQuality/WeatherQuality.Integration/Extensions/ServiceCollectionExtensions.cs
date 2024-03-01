@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using WeatherQuality.Integration.Interfaces;
 
 namespace WeatherQuality.Integration.Extensions;
 
