@@ -7,12 +7,12 @@ using WeatherQuality.Domain.Response;
 
 namespace WeatherQuality.Integration;
 
-public class OpenMeteoIntegration : IIntegration
+public class OpenMeteoAirQualityIntegration : IAirQualityIntegration
 {
-    private ILogger<OpenMeteoIntegration> _logger;
+    private ILogger<OpenMeteoAirQualityIntegration> _logger;
     private string _baseUrl = "https://air-quality-api.open-meteo.com/v1/air-quality";
 
-    public OpenMeteoIntegration(ILogger<OpenMeteoIntegration> logger) => _logger = logger;
+    public OpenMeteoAirQualityIntegration(ILogger<OpenMeteoAirQualityIntegration> logger) => _logger = logger;
 
     /// <summary>
     /// Gets air quality results

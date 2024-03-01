@@ -2,8 +2,6 @@
 using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
 using Botticelli.Shared.ValueObjects;
-using Telegram.Bot.Requests;
-using WeatherQuality.Domain.Response;
 using SendMessageRequest = Botticelli.Shared.API.Client.Requests.SendMessageRequest;
 
 namespace WeatherQuality.Telegram.Commands.Processors;

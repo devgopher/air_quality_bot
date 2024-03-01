@@ -1,6 +1,4 @@
-﻿using SixLabors.ImageSharp;
-
-namespace WeatherQuality.Telegram.Settings;
+﻿namespace WeatherQuality.Telegram.Settings;
 
 /// <summary>
 /// Criteria + text + image

@@ -3,7 +3,6 @@ using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
 using Botticelli.Framework.SendOptions;
 using Botticelli.Shared.API.Client.Requests;
-using Botticelli.Shared.Constants;
 using Botticelli.Shared.ValueObjects;
 using Telegram.Bot.Types.ReplyMarkups;
 

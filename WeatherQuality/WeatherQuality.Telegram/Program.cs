@@ -33,7 +33,7 @@ builder.Services
             })
             .Set(s => s.Name = settings?.BotName))
     .AddLogging(cfg => cfg.AddNLog())
-    .AddScoped<IIntegration, OpenMeteoIntegration>()
+    .AddScoped<IAirQualityIntegration, OpenMeteoAirQualityIntegration>()
     .AddHostedService<WeatherBotHostedService>()
     .AddScoped<StartCommandProcessor>()
     .AddScoped<StopCommandProcessor>()

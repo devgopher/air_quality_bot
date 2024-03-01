@@ -3,7 +3,7 @@ using WeatherQuality.Domain.Response;
 
 namespace WeatherQuality.Integration;
 
-public interface IIntegration
+public interface IAirQualityIntegration
 {
     /// <summary>
     /// Gets air quality results

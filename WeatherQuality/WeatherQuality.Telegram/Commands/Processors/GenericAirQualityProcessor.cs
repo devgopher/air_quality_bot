@@ -19,7 +19,7 @@ namespace WeatherQuality.Telegram.Commands.Processors;
 public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where T : class, ICommand
 {
     protected readonly IOptionsSnapshot<WeatherQualitySettings> Settings;
-    private readonly IIntegration _integration;
+    private readonly IAirQualityIntegration _airQualityIntegration;
     private readonly GeoCacheExplorer _geoCacheExplorer;
     private readonly IServiceProvider _sp;
     protected readonly ILocationService LocationService;
@@ -27,12 +27,12 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
 
     protected GenericAirQualityProcessor(ILogger logger,
         IOptionsSnapshot<WeatherQualitySettings> settings,
-        ICommandValidator<T> validator, MetricsProcessor metricsProcessor, IIntegration integration,
+        ICommandValidator<T> validator, MetricsProcessor metricsProcessor, IAirQualityIntegration airQualityIntegration,
         GeoCacheExplorer geoCacheExplorer, IServiceProvider sp, ILocationService locationService) : base(logger,
         validator, metricsProcessor)
     {
         Settings = settings;
-        _integration = integration;
+        _airQualityIntegration = airQualityIntegration;
         _geoCacheExplorer = geoCacheExplorer;
         _sp = sp;
         LocationService = locationService;
@@ -107,7 +107,7 @@ public abstract class GenericAirQualityProcessor<T> : CommandProcessor<T> where 
             Timezone = string.Empty
         };
 
-        var integrationResponse = await _integration.GetAirQualityAsync(request);
+        var integrationResponse = await _airQualityIntegration.GetAirQualityAsync(request);
         var current = integrationResponse.Current;
         if (current != default)
             cachedResponse.Current.MergeByDefaultValues(current);

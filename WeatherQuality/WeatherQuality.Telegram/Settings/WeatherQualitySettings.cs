@@ -21,7 +21,7 @@ public class WeatherQualitySettings
     public double CachingPeriod { get; set; } = 1.0;
 
     /// <summary>
-    /// Criterias
+    /// Criteria
     /// </summary>
-    public List<MetricCriteria> Criteria { get; set; }
+    public List<MetricCriteria>? Criteria { get; set; }
 }

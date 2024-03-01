@@ -21,21 +21,6 @@ public class OsmLocationService : ILocationService
     {
     }
 
-    public async Task<string?> GetCountry(double lat, double lng)
-        => (await InnerGetAddress(lat, lng))?.Address?.Country;
-
-    public async Task<string?> GetRegion(double lat, double lng)
-    {
-        var address = (await InnerGetAddress(lat, lng))?.Address;
-        return $"{address?.Region}, {address?.State}";
-    }
-
-    public async Task<string?> GetLocality(double lat, double lng)
-    {
-        var address = (await InnerGetAddress(lat, lng))?.Address;
-        return address?.City ?? address?.Town ?? address?.Village ?? address?.Hamlet;
-    }
-
     public async Task<string?> GetFullAddress(double lat, double lng)
         => (await InnerGetAddress(lat, lng))?.DisplayName;
 

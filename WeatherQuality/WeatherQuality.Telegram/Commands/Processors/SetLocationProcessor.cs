@@ -1,10 +1,8 @@
 ﻿using Botticelli.Client.Analytics;
 using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
-using Botticelli.Framework.SendOptions;
 using Botticelli.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
-using Telegram.Bot.Types.ReplyMarkups;
 using WeatherQuality.Infrastructure;
 using WeatherQuality.Infrastructure.Models;
 

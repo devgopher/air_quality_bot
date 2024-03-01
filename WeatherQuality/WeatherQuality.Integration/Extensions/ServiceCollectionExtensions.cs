@@ -5,14 +5,6 @@ namespace WeatherQuality.Integration.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddLocationService(this IServiceCollection services)
-    {
-        services.AddScoped<ILocationService, OsmLocationService>()
-            .AddHttpClient<OsmLocationService>();
-
-        return services;
-    }
-    
     public static IServiceCollection AddCachedLocationService(this IServiceCollection services)
     {
         services

@@ -1,12 +1,9 @@
 ﻿using Botticelli.Client.Analytics;
 using Botticelli.Framework.Commands.Validators;
-using Botticelli.Framework.SendOptions;
 using Botticelli.Shared.API.Client.Requests;
-using Botticelli.Shared.Constants;
 using Botticelli.Shared.ValueObjects;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
-using Telegram.Bot.Types.ReplyMarkups;
 using WeatherQuality.Domain.Response;
 using WeatherQuality.Infrastructure;
 using WeatherQuality.Integration;
@@ -19,10 +16,10 @@ public class GetAirQualityProcessor : GenericAirQualityProcessor<GetAirQualityCo
     public GetAirQualityProcessor(ILogger<GetAirQualityProcessor> logger,
         IOptionsSnapshot<WeatherQualitySettings> settings,
         ICommandValidator<GetAirQualityCommand> validator,
-        MetricsProcessor metricsProcessor, IIntegration integration,
+        MetricsProcessor metricsProcessor, IAirQualityIntegration airQualityIntegration,
         GeoCacheExplorer geoCacheExplorer,
         IServiceProvider sp, ILocationService locationService) : base(logger, settings, validator, metricsProcessor,
-        integration, geoCacheExplorer, sp, locationService)
+        airQualityIntegration, geoCacheExplorer, sp, locationService)
     {
     }
 
