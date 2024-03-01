@@ -1,10 +1,7 @@
-﻿using EmergencyServicesWorldwideBot.Interaction.OSM.Settings;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
-using MemoryCache = Microsoft.Extensions.Caching.Memory.MemoryCache;
 
-namespace EmergencyServicesWorldwideBot.Interaction.OSM.Extensions;
+namespace WeatherQuality.Integration.Extensions;
 
 public static class ServiceCollectionExtensions
 {

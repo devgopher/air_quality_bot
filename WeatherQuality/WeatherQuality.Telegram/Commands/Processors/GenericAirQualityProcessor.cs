@@ -5,7 +5,6 @@ using Botticelli.Framework.Commands.Validators;
 using Botticelli.Framework.SendOptions;
 using Botticelli.Shared.Constants;
 using Botticelli.Shared.ValueObjects;
-using EmergencyServicesWorldwideBot.Interaction.OSM;
 using Microsoft.Extensions.Options;
 using Telegram.Bot.Types.ReplyMarkups;
 using WeatherQuality.Domain.Request;

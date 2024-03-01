@@ -1,4 +1,4 @@
-﻿namespace EmergencyServicesWorldwideBot.Interaction.OSM.Settings;
+﻿namespace WeatherQuality.Integration.Settings;
 
 public class LocationCacheSettings
 {

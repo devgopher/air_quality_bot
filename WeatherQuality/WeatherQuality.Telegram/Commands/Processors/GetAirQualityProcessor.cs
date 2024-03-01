@@ -4,7 +4,6 @@ using Botticelli.Framework.SendOptions;
 using Botticelli.Shared.API.Client.Requests;
 using Botticelli.Shared.Constants;
 using Botticelli.Shared.ValueObjects;
-using EmergencyServicesWorldwideBot.Interaction.OSM;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using Telegram.Bot.Types.ReplyMarkups;

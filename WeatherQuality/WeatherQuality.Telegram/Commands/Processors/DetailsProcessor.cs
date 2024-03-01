@@ -3,7 +3,6 @@ using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
 using Botticelli.Shared.API.Client.Requests;
 using Botticelli.Shared.ValueObjects;
-using EmergencyServicesWorldwideBot.Interaction.OSM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;

@@ -9,7 +9,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\botticelli\Botticelli.Framework.Telegram\Botticelli.Framework.Telegram.csproj"/>
 		<ProjectReference Include="..\..\botticelli\Botticelli.Interfaces\Botticelli.Interfaces.csproj"/>
-		<ProjectReference Include="..\EmergencyServicesWorldwideBot.Interaction.OSM\EmergencyServicesWorldwideBot.Interaction.OSM.csproj" />
 		<ProjectReference Include="..\WeatherQuality.Infrastructure\WeatherQuality.Infrastructure.csproj"/>
 		<ProjectReference Include="..\WeatherQuality.Integration\WeatherQuality.Integration.csproj"/>
 		<ProjectReference Include="..\WeatherQuality.Utils\WeatherQuality.Utils.csproj"/>

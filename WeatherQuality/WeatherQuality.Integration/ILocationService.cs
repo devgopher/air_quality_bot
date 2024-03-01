@@ -1,4 +1,4 @@
-﻿namespace EmergencyServicesWorldwideBot.Interaction.OSM
+﻿namespace WeatherQuality.Integration
 {
     public interface ILocationService
     {

@@ -1,10 +1,11 @@
-﻿using EmergencyServicesWorldwideBot.Interaction.OSM.Settings;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nominatim.API.Models;
+using WeatherQuality.Integration.Settings;
+using IHttpClientFactory = System.Net.Http.IHttpClientFactory;
 
-namespace EmergencyServicesWorldwideBot.Interaction.OSM;
+namespace WeatherQuality.Integration;
 
 public class CachedOsmLocationService : ILocationService
 {

@@ -1,18 +1,9 @@
-﻿using GMap.NET;
-using GMap.NET.MapProviders;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Nominatim.API.Address;
+﻿using Microsoft.Extensions.Logging;
 using Nominatim.API.Geocoders;
-using Nominatim.API.Interfaces;
 using Nominatim.API.Models;
 using Nominatim.API.Web;
-using NSubstitute;
-using OsmSharp.API;
-using OsmSharp.IO.API;
-using static GMap.NET.Entity.OpenStreetMapGeocodeEntity;
 
-namespace EmergencyServicesWorldwideBot.Interaction.OSM;
+namespace WeatherQuality.Integration;
 
 public class OsmLocationService : ILocationService
 {
