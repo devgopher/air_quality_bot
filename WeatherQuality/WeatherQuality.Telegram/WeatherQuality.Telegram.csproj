@@ -9,6 +9,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\botticelli\Botticelli.Framework.Telegram\Botticelli.Framework.Telegram.csproj"/>
 		<ProjectReference Include="..\..\botticelli\Botticelli.Interfaces\Botticelli.Interfaces.csproj"/>
+		<ProjectReference Include="..\..\botticelli\Botticelli.Scheduler\Botticelli.Scheduler.csproj" />
 		<ProjectReference Include="..\WeatherQuality.Infrastructure\WeatherQuality.Infrastructure.csproj"/>
 		<ProjectReference Include="..\WeatherQuality.Integration\WeatherQuality.Integration.csproj"/>
 		<ProjectReference Include="..\WeatherQuality.Utils\WeatherQuality.Utils.csproj"/>
@@ -48,6 +49,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="7.0.0"/>
+		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.11" />
+		<PackageReference Include="Hangfire.Core" Version="1.8.11" />
+		<PackageReference Include="Hangfire.MemoryStorage" Version="1.8.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.14"/>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.14">
 			<PrivateAssets>all</PrivateAssets>

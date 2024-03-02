@@ -21,6 +21,16 @@ public class WeatherQualitySettings
     public double CachingPeriod { get; set; } = 1.0;
 
     /// <summary>
+    /// Cache cleaning age
+    /// </summary>
+    public double CacheCleaningAge { get; set; } = 24.0;
+
+    /// <summary>
+    /// Cache cleaning batch size
+    /// </summary>
+    public int CacheCleaningBatchSize { get; set; } = 100000;
+    
+    /// <summary>
     /// Criteria
     /// </summary>
     public List<MetricCriteria>? Criteria { get; set; }

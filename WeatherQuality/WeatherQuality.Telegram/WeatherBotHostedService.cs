@@ -1,6 +1,8 @@
 ﻿using Botticelli.Framework.Telegram;
 using Botticelli.Interfaces;
+using Hangfire;
 using Microsoft.Extensions.Options;
+using WeatherQuality.Telegram.Jobs;
 using WeatherQuality.Telegram.Settings;
 
 namespace WeatherQuality.Telegram;
@@ -22,6 +24,10 @@ public class WeatherBotHostedService : IHostedService
     public Task StartAsync(CancellationToken token)
     {
         Console.WriteLine("Start sending messages...");
+        
+        RecurringJob.AddOrUpdate<ClearCacheJob>("CleanCacheJob", 
+            job => job.Execute(JobCancellationToken.Null),
+            Cron.Daily);
 
         return Task.CompletedTask;
     }
@@ -30,6 +36,8 @@ public class WeatherBotHostedService : IHostedService
     {
         Console.WriteLine("Stop sending messages...");
 
+        RecurringJob.RemoveIfExists("CleanCacheJob");
+        
         return Task.CompletedTask;
     }
 }

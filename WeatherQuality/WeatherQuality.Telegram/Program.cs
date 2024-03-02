@@ -5,6 +5,9 @@ using Botticelli.Framework.Options;
 using Botticelli.Framework.Telegram;
 using Botticelli.Framework.Telegram.Extensions;
 using Botticelli.Framework.Telegram.Options;
+using Botticelli.Scheduler;
+using Hangfire;
+using Hangfire.MemoryStorage;
 using Microsoft.EntityFrameworkCore;
 using NLog.Extensions.Logging;
 using WeatherQuality.Infrastructure;
@@ -15,6 +18,7 @@ using WeatherQuality.Integration.Settings;
 using WeatherQuality.Telegram;
 using WeatherQuality.Telegram.Commands;
 using WeatherQuality.Telegram.Commands.Processors;
+using WeatherQuality.Telegram.Jobs;
 using WeatherQuality.Telegram.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,15 +43,23 @@ builder.Services
     .AddScoped<StartCommandProcessor>()
     .AddScoped<StopCommandProcessor>()
     .AddScoped<GeoCacheExplorer>()
+    .AddScoped<ClearCacheJob>()
     .AddCachedLocationService()
     .AddBotCommand<StartCommand, StartCommandProcessor, PassValidator<StartCommand>>()
     .AddBotCommand<StopCommand, StopCommandProcessor, PassValidator<StopCommand>>()
     .AddBotCommand<GetAirQualityCommand, GetAirQualityProcessor, PassValidator<GetAirQualityCommand>>()
     .AddBotCommand<SetLocationCommand, SetLocationProcessor, PassValidator<SetLocationCommand>>()
     .AddBotCommand<DetailsCommand, DetailsProcessor, PassValidator<DetailsCommand>>()
+    .AddHangfire(cfg => cfg
+        .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseActivator(new HangfireActivator(builder.Services))
+        .UseRecommendedSerializerSettings()
+        .UseMemoryStorage()
+        .UseNLogLogProvider())
+    .AddHangfireServer(opt => opt.CancellationCheckInterval = TimeSpan.FromSeconds(30))
     .AddDbContext<WeatherQualityContext>(c => c.UseNpgsql(settings!.DbConnectionString),
         ServiceLifetime.Transient);
-// builder.ApplyMigrations<WeatherQualityContext>();
 
 var app = builder.Build();
 app.Services.RegisterBotCommand<StartCommand, StartCommandProcessor, TelegramBot>()
