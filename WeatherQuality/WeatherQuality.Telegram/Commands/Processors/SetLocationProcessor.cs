@@ -88,8 +88,8 @@ public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
             {
                 Uid = message.Uid,
                 ChatIds = message.ChatIds,
-                Subject = "Location received... Now you may get air quality",
-                Body = string.Empty
+                Subject = "Location received...",
+                Body = "Now you may get air quality"
             }
         }, Options, token);
     }
