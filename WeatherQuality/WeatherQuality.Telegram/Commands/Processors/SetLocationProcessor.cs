@@ -2,6 +2,7 @@
 using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
 using Botticelli.Framework.SendOptions;
+using Botticelli.Shared.API.Client.Requests;
 using Botticelli.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -80,6 +81,17 @@ public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
         }
         
         await _context.SaveChangesAsync(token);
+        
+        await _bot.SendMessageAsync(new SendMessageRequest(message.Uid)
+        {
+            Message = new Message
+            {
+                Uid = message.Uid,
+                ChatIds = message.ChatIds,
+                Subject = "Location received... Now you may get air quality",
+                Body = string.Empty
+            }
+        }, Options, token);
     }
 
     protected override async Task InnerProcess(Message message, string args, CancellationToken token)  {
