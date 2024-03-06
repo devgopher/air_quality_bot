@@ -1,8 +1,10 @@
 ﻿using Botticelli.Client.Analytics;
 using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
+using Botticelli.Framework.SendOptions;
 using Botticelli.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
+using Telegram.Bot.Types.ReplyMarkups;
 using WeatherQuality.Infrastructure;
 using WeatherQuality.Infrastructure.Models;
 
@@ -11,11 +13,34 @@ namespace WeatherQuality.Telegram.Commands.Processors;
 public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
 {
     private readonly WeatherQualityContext _context;
-
+    protected readonly SendOptionsBuilder<ReplyMarkupBase> Options;
+    
     public SetLocationProcessor(ILogger<SetLocationProcessor> logger, ICommandValidator<SetLocationCommand> validator, MetricsProcessor metricsProcessor, WeatherQualityContext context) 
         : base(logger, validator, metricsProcessor)
     {
         _context = context;
+        Options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
+        {
+            new[]
+            {
+                new KeyboardButton("/Details")
+                {
+                    RequestLocation = false
+                },
+                new KeyboardButton("/GetAirQuality")
+                {
+                    RequestLocation = false
+                },
+                new KeyboardButton("/SetLocation")
+                {
+                    RequestLocation = true
+                }
+            }
+        })
+        {
+            ResizeKeyboard = true,
+            IsPersistent = true
+        });
     }
 
     protected override async Task InnerProcessContact(Message message, string args, CancellationToken token)
