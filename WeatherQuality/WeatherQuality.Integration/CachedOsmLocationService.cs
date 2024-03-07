@@ -22,6 +22,21 @@ public class CachedOsmLocationService : ILocationService
     }
 
     public async Task<string?> GetFullAddress(double lat, double lng) => (await InnerGetAddress(lat, lng))?.DisplayName;
+    public async Task<IEnumerable<string>?> Search(string query, int limitResults)
+        => (await InnerSearch(query, limitResults))?.Select(g => g.DisplayName);
+
+    private async Task<IEnumerable<GeocodeResponse>?> InnerSearch(string query, int limitResults = 5)
+    {
+        if (_cache.TryGetValue(query, out IEnumerable<GeocodeResponse>? response)) 
+            return response;
+        
+        response = (await _service.InnerSearch(query, limitResults))
+            .ToArray();
+
+        _cache.Set(query, response, _settings.Value.Expiration ?? TimeSpan.FromDays(1));
+
+        return response;
+    }
     
     private async Task<GeocodeResponse?> InnerGetAddress(double lat, double lng)
     {

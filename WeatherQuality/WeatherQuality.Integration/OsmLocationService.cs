@@ -25,17 +25,15 @@ public class OsmLocationService : ILocationService
     public async Task<string?> GetFullAddress(double lat, double lng)
         => (await InnerGetAddress(lat, lng))?.DisplayName;
 
-    public async Task<string?> GetInternationalAddress(double lat, double lng)
-    {
-        var fullAddress = await InnerGetAddress(lat, lng);
-
-        return fullAddress?.DisplayName;
-    }
+    public async Task<IEnumerable<string>?> Search(string query, int limitResults = 5)
+        => (await InnerSearch(query, limitResults))?
+            .Select(g => g.DisplayName)
+            .ToList();
 
     public async Task<GeocodeResponse?> InnerGetAddress(double lat, double lng)
     {
         var nominatimWebInterface = new NominatimWebInterface(_httpClientFactory);
-
+       
         var geoCoder = new ReverseGeocoder(nominatimWebInterface);
 
         var response = await geoCoder.ReverseGeocode(new ReverseGeocodeRequest()
@@ -43,7 +41,22 @@ public class OsmLocationService : ILocationService
             Latitude = lat,
             Longitude = lng
         });
+        
+        return response;
+    }
+    
+    public async Task<IEnumerable<GeocodeResponse>> InnerSearch(string query, int limitResults)
+    {
+        var nominatimWebInterface = new NominatimWebInterface(_httpClientFactory);
+       
+        var geoCoder = new ForwardGeocoder(nominatimWebInterface);
 
+        var response = await geoCoder.Geocode(new ForwardGeocodeRequest
+        {
+            queryString = query,
+            LimitResults = limitResults,
+        });
+        
         return response;
     }
 }
