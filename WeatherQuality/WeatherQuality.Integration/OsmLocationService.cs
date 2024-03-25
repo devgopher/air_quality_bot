@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using GeoTimeZone;
+using Microsoft.Extensions.Logging;
 using Nominatim.API.Geocoders;
 using Nominatim.API.Models;
 using Nominatim.API.Web;
@@ -25,12 +26,8 @@ public class OsmLocationService : ILocationService
     public async Task<string?> GetFullAddress(double lat, double lng)
         => (await InnerGetAddress(lat, lng))?.DisplayName;
 
-    public async Task<string?> GetInternationalAddress(double lat, double lng)
-    {
-        var fullAddress = await InnerGetAddress(lat, lng);
-
-        return fullAddress?.DisplayName;
-    }
+    public Task<TimeZoneInfo?> GetTimeZone(double lat, double lng) 
+        => Task.FromResult(TimeZoneInfo.FromSerializedString(TimeZoneLookup.GetTimeZone(lat, lng).Result))!;
 
     public async Task<GeocodeResponse?> InnerGetAddress(double lat, double lng)
     {

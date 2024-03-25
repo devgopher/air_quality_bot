@@ -8,4 +8,5 @@ public class UserLocationModel
     public string ChatId { get; set; }
     public float Latitude { get; set; }
     public float Longitude { get; set; }
+    public string TimeZone { get; set; }
 }

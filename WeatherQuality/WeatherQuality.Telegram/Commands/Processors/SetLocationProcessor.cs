@@ -14,13 +14,13 @@ namespace WeatherQuality.Telegram.Commands.Processors;
 public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
 {
     private readonly WeatherQualityContext _context;
-    protected readonly SendOptionsBuilder<ReplyMarkupBase> Options;
+    private readonly SendOptionsBuilder<ReplyMarkupBase> _options;
     
     public SetLocationProcessor(ILogger<SetLocationProcessor> logger, ICommandValidator<SetLocationCommand> validator, MetricsProcessor metricsProcessor, WeatherQualityContext context) 
         : base(logger, validator, metricsProcessor)
     {
         _context = context;
-        Options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
+        _options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
         {
             new[]
             {
@@ -91,7 +91,7 @@ public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
                 Subject = "Location received...",
                 Body = "Now you may get air quality"
             }
-        }, Options, token);
+        }, _options, token);
     }
 
     protected override async Task InnerProcess(Message message, string args, CancellationToken token)  {

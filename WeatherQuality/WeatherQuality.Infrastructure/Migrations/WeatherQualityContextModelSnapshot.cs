@@ -94,6 +94,10 @@ namespace WeatherQuality.Telegram.Migrations
                     b.Property<float>("Longitude")
                         .HasColumnType("real");
 
+                    b.Property<string>("TimeZone")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("ChatId");
 
                     b.ToTable("UserLocationModels");
