@@ -8,28 +8,13 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
 
-public class StartCommandProcessor : CommandProcessor<StartCommand>
+public class SelectScheduleMinuteProcessor : CommandProcessor<Minute>
 {
-    private readonly SendOptionsBuilder<ReplyMarkupBase> _options;
-
-    public StartCommandProcessor(ILogger<StartCommandProcessor> logger,
-        ICommandValidator<StartCommand> validator,
+    public SelectScheduleMinuteProcessor(ILogger<SelectScheduleMinuteProcessor> logger,
+        ICommandValidator<Minute> validator,
         MetricsProcessor metricsProcessor)
         : base(logger, validator, metricsProcessor)
     {
-        _options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
-        {
-            new[]
-            {
-                new KeyboardButton("/SetLocation")
-                {
-                    RequestLocation = true
-                }
-            }
-        })
-        {
-            ResizeKeyboard = true
-        });
     }
 
     protected override async Task InnerProcessContact(Message message, string argsString, CancellationToken token)
@@ -46,17 +31,29 @@ public class StartCommandProcessor : CommandProcessor<StartCommand>
 
     protected override async Task InnerProcess(Message message, string args, CancellationToken token)
     {
-        var chatId = message.ChatIds.FirstOrDefault();
-        var greetingMessageRequest = new SendMessageRequest(Guid.NewGuid().ToString())
+        var options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
+        {
+            new[] { 0, 15, 30, 45 }.Select(
+                x => new KeyboardButton($"/Schedule {args}:{x:D2}")
+                {
+                    RequestLocation = false
+                }
+            )
+        })
+        {
+            ResizeKeyboard = true
+        });
+
+        var selectHourMessageRequest = new SendMessageRequest(Guid.NewGuid().ToString())
         {
             Message = new Message
             {
                 Uid = Guid.NewGuid().ToString(),
                 ChatIds = message.ChatIds,
-                Body = "Bot started..."
+                Body = "Select minute..."
             }
         };
 
-        await _bot.SendMessageAsync(greetingMessageRequest, _options, token);
+        await _bot.SendMessageAsync(selectHourMessageRequest, options, token);
     }
 }

@@ -8,12 +8,9 @@ using Hangfire.Storage;
 namespace WeatherQuality.Telegram.Commands.Processors;
 
 public class CleanScheduleProcessor : CommandProcessor<CleanScheduleCommand>
-{
-    private readonly IMonitoringApi _monitoringApi = JobStorage.Current.GetMonitoringApi();
-        
-    public CleanScheduleProcessor(ILogger logger, ICommandValidator<CleanScheduleCommand> validator, MetricsProcessor metricsProcessor) : base(logger, validator, metricsProcessor)
-    {
-    }
+ {
+    public CleanScheduleProcessor(ILogger<CleanScheduleProcessor> logger, ICommandValidator<CleanScheduleCommand> validator, MetricsProcessor metricsProcessor) : base(logger, validator, metricsProcessor) 
+    {}
 
     protected override async Task InnerProcessContact(Message message, string args, CancellationToken token) => throw new NotImplementedException();
 
@@ -23,12 +20,13 @@ public class CleanScheduleProcessor : CommandProcessor<CleanScheduleCommand>
 
     protected override async Task InnerProcess(Message message, string args, CancellationToken token)
     {
+      
         foreach (var chatId in message.ChatIds)
         {
-            var jobs =_monitoringApi.ScheduledJobs(0, int.MaxValue).Where(j => j.Key.StartsWith($"SendAqiJob_{chatId}"));
+            var jobs = JobStorage.Current.GetConnection().GetRecurringJobs().Where(j => j.Id.StartsWith($"SendAqiJob_{chatId}"));
 
             foreach (var job in jobs) 
-                RecurringJob.RemoveIfExists(job.Key);
+                RecurringJob.RemoveIfExists(job.Id);
         }
     }
 }

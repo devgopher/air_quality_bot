@@ -8,24 +8,41 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
 
-public class StartCommandProcessor : CommandProcessor<StartCommand>
+public class SelectScheduleProcessor : CommandProcessor<SelectScheduleCommand>
 {
     private readonly SendOptionsBuilder<ReplyMarkupBase> _options;
 
-    public StartCommandProcessor(ILogger<StartCommandProcessor> logger,
-        ICommandValidator<StartCommand> validator,
+    public SelectScheduleProcessor(ILogger<SelectScheduleProcessor> logger,
+        ICommandValidator<SelectScheduleCommand> validator,
         MetricsProcessor metricsProcessor)
         : base(logger, validator, metricsProcessor)
     {
         _options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
         {
-            new[]
-            {
-                new KeyboardButton("/SetLocation")
+            Enumerable.Range(0, 6).Select(
+                x => new KeyboardButton($"/minute {x:D2}")
                 {
-                    RequestLocation = true
+                    RequestLocation = false
                 }
-            }
+            ),
+            Enumerable.Range(6, 6).Select(
+                x => new KeyboardButton($"/minute {x:D2}")
+                {
+                    RequestLocation = false
+                }
+            ),
+            Enumerable.Range(12, 6).Select(
+                x => new KeyboardButton($"/minute {x:D2}")
+                {
+                    RequestLocation = false
+                }
+            ),
+            Enumerable.Range(18, 6).Select(
+                x => new KeyboardButton($"/minute {x:D2}")
+                {
+                    RequestLocation = false
+                }
+            ),
         })
         {
             ResizeKeyboard = true
@@ -46,17 +63,16 @@ public class StartCommandProcessor : CommandProcessor<StartCommand>
 
     protected override async Task InnerProcess(Message message, string args, CancellationToken token)
     {
-        var chatId = message.ChatIds.FirstOrDefault();
-        var greetingMessageRequest = new SendMessageRequest(Guid.NewGuid().ToString())
+        var selectHourMessageRequest = new SendMessageRequest(Guid.NewGuid().ToString())
         {
             Message = new Message
             {
                 Uid = Guid.NewGuid().ToString(),
                 ChatIds = message.ChatIds,
-                Body = "Bot started..."
+                Body = "Select hour..."
             }
         };
 
-        await _bot.SendMessageAsync(greetingMessageRequest, _options, token);
+        await _bot.SendMessageAsync(selectHourMessageRequest, _options, token);
     }
 }

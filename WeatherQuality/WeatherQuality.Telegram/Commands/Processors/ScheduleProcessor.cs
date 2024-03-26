@@ -1,8 +1,10 @@
 ﻿using Botticelli.Client.Analytics;
 using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
+using Botticelli.Shared.API.Client.Requests;
 using Botticelli.Shared.ValueObjects;
 using Hangfire;
+using WeatherQuality.Telegram.Commands.ReplyOptions;
 using WeatherQuality.Telegram.Jobs;
 using WeatherQuality.Telegram.Services;
 
@@ -12,14 +14,12 @@ public class ScheduleProcessor : CommandProcessor<ScheduleCommand>
 {
     private readonly IGetLocationService _locationService;
     
-    public ScheduleProcessor(ILogger<DetailsProcessor> logger,
+    public ScheduleProcessor(ILogger<ScheduleProcessor> logger,
         ICommandValidator<ScheduleCommand> validator,
         MetricsProcessor metricsProcessor,
         IGetLocationService locationService) : base(logger,
-        validator, metricsProcessor)
-    {
-        _locationService = locationService;
-    }
+        validator, metricsProcessor) 
+        => _locationService = locationService;
 
     protected override async Task InnerProcessContact(Message message, string args, CancellationToken token) => throw new NotImplementedException();
 
@@ -29,18 +29,29 @@ public class ScheduleProcessor : CommandProcessor<ScheduleCommand>
 
     protected override async Task InnerProcess(Message message, string args, CancellationToken token)
     {
+        var hhMm = args.Split(':').Select(int.Parse); 
         foreach (var chatId in message.ChatIds)
         {
             var location = _locationService.GetLocation(message);
-
-            var hhMm = args.Split(':'); 
-            
+           
             RecurringJob.AddOrUpdate<SendAqiJob>(
                 recurringJobId: $"SendAqiJob_{chatId}_{args}", 
                methodCall: job => job.Execute(message, JobCancellationToken.Null),
-               cronExpression: () => $"{hhMm[1]} {hhMm[0]} * * *", 
+               cronExpression: () => Cron.Daily(hhMm.First(),hhMm.Skip(1).First()), 
                timeZone: await _locationService.GetTimeZone(location!),
                queue : "default");
         }
+        
+        var selectHourMessageRequest = new SendMessageRequest(Guid.NewGuid().ToString())
+        {
+            Message = new Message
+            {
+                Uid = Guid.NewGuid().ToString(),
+                ChatIds = message.ChatIds,
+                Body = "Schedule submitted..."
+            }
+        };
+
+        await _bot.SendMessageAsync(selectHourMessageRequest, Replies.GeneralReplyOptions, token);
     }
 }

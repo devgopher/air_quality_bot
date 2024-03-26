@@ -26,8 +26,12 @@ public class OsmLocationService : ILocationService
     public async Task<string?> GetFullAddress(double lat, double lng)
         => (await InnerGetAddress(lat, lng))?.DisplayName;
 
-    public Task<TimeZoneInfo?> GetTimeZone(double lat, double lng) 
-        => Task.FromResult(TimeZoneInfo.FromSerializedString(TimeZoneLookup.GetTimeZone(lat, lng).Result))!;
+    public Task<TimeZoneInfo?> GetTimeZone(double lat, double lng)
+    {
+        var tz = TimeZoneLookup.GetTimeZone(lat, lng).Result;
+        var tzi = TimeZoneInfo.FindSystemTimeZoneById(tz);
+        return Task.FromResult(tzi)!;
+    }
 
     public async Task<GeocodeResponse?> InnerGetAddress(double lat, double lng)
     {

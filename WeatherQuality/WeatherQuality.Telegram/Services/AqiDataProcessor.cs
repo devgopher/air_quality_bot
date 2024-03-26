@@ -12,6 +12,7 @@ using WeatherQuality.Domain.Response;
 using WeatherQuality.Infrastructure;
 using WeatherQuality.Infrastructure.Models;
 using WeatherQuality.Integration.Interfaces;
+using WeatherQuality.Telegram.Commands.ReplyOptions;
 using WeatherQuality.Telegram.Settings;
 
 namespace WeatherQuality.Telegram.Services;
@@ -21,8 +22,6 @@ public class AqiDataProcessor : IAqiDataProcessor, IDetailsDataProcessor
     private readonly IOptionsSnapshot<WeatherQualitySettings> _settings;
     private readonly IAirQualityIntegration _airQualityIntegration;
     private readonly GeoCacheExplorer _geoCacheExplorer;
-
-    private readonly SendOptionsBuilder<ReplyMarkupBase> _options;
     private readonly IBot _bot;
     private readonly IGetLocationService _getLocationService;
 
@@ -36,29 +35,6 @@ public class AqiDataProcessor : IAqiDataProcessor, IDetailsDataProcessor
         _geoCacheExplorer = geoCacheExplorer;
         _bot = bot;
         _getLocationService = getLocationService;
-
-        _options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
-        {
-            new[]
-            {
-                new KeyboardButton("/Details")
-                {
-                    RequestLocation = false
-                },
-                new KeyboardButton("/GetAirQuality")
-                {
-                    RequestLocation = false
-                },
-                new KeyboardButton("/SetLocation")
-                {
-                    RequestLocation = true
-                }
-            }
-        })
-        {
-            ResizeKeyboard = true,
-            IsPersistent = true
-        });
     }
     
     public async Task DetailsProcess(Message message, CancellationToken token)
@@ -93,7 +69,7 @@ public class AqiDataProcessor : IAqiDataProcessor, IDetailsDataProcessor
         await _bot.SendMessageAsync(new SendMessageRequest(message.Uid)
         {
             Message = respMessage
-        }, _options, token);
+        }, Replies.GeneralReplyOptions, token);
     }
 
     public async Task AqiProcess(Message message, CancellationToken token)
@@ -127,11 +103,10 @@ public class AqiDataProcessor : IAqiDataProcessor, IDetailsDataProcessor
         await _bot.SendMessageAsync(new SendMessageRequest(message.Uid)
         {
             Message = respMessage
-        }, _options, token);
+        }, Replies.GeneralReplyOptions, token);
     }
 
-
-    protected async Task<Response> ProcessCache(CancellationToken token, List<string> elements,
+    private async Task<Response> ProcessCache(CancellationToken token, List<string> elements,
         UserLocationModel? location)
     {
         // Get available info from cache
@@ -207,7 +182,7 @@ public class AqiDataProcessor : IAqiDataProcessor, IDetailsDataProcessor
         return cachedResponse;
     }
 
-    protected static Message? CreateResponseMessage(Message message, string subj, string? body, byte[]? image = null)
+    private static Message? CreateResponseMessage(Message message, string subj, string? body, byte[]? image = null)
     {
         var respMessage = new Message
         {
@@ -229,8 +204,6 @@ public class AqiDataProcessor : IAqiDataProcessor, IDetailsDataProcessor
 
         return respMessage;
     }
-
-
 
     private static byte[] GenerateImage(Response response, MetricCriteria criteria)
     {

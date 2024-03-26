@@ -45,8 +45,11 @@ builder.Services
     .AddHostedService<WeatherBotHostedService>()
     .AddScoped<StartCommandProcessor>()
     .AddScoped<StopCommandProcessor>()
+    .AddScoped<SelectScheduleProcessor>()
+    .AddScoped<SelectScheduleMinuteProcessor>()
     .AddScoped<GeoCacheExplorer>()
     .AddScoped<ClearCacheJob>()
+    .AddScoped<SendAqiJob>()
     .AddCachedLocationService()
     .AddScoped<IGetLocationService, GetLocationService>()
     .AddScoped<IAqiDataProcessor, AqiDataProcessor>()
@@ -58,12 +61,22 @@ builder.Services
     .AddBotCommand<CleanScheduleCommand, CleanScheduleProcessor, PassValidator<CleanScheduleCommand>>()
     .AddBotCommand<DetailsCommand, DetailsProcessor, PassValidator<DetailsCommand>>()
     .AddBotCommand<ScheduleCommand, ScheduleProcessor, ScheduleValidator>()
+    .AddBotCommand<SelectScheduleCommand, SelectScheduleProcessor, PassValidator<SelectScheduleCommand>>()
+    .AddBotCommand<Minute, SelectScheduleMinuteProcessor, PassValidator<Minute>>()
     .AddHangfire(cfg => cfg
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
         .UseSimpleAssemblyNameTypeSerializer()
         .UseActivator(new HangfireActivator(builder.Services))
         .UseRecommendedSerializerSettings()
-        .UsePostgreSqlStorage(opt => opt.UseNpgsqlConnection(settings!.DbConnectionString))
+        .UsePostgreSqlStorage(settings!.DbConnectionString,
+            new PostgreSqlStorageOptions()
+            {
+                InvisibilityTimeout = TimeSpan.FromMinutes(5),
+                QueuePollInterval = TimeSpan.FromMilliseconds(200),
+                DistributedLockTimeout = TimeSpan.FromMinutes(1),
+                PrepareSchemaIfNecessary = true,
+                SchemaName = "schedules"
+            })
         .UseNLogLogProvider())
     .AddHangfireServer(opt => opt.CancellationCheckInterval = TimeSpan.FromSeconds(30))
     .AddDbContext<WeatherQualityContext>(c => c.UseNpgsql(settings!.DbConnectionString),
@@ -76,6 +89,8 @@ app.Services.RegisterBotCommand<StartCommand, StartCommandProcessor, TelegramBot
     .RegisterBotCommand<SetLocationCommand, SetLocationProcessor, TelegramBot>()
     .RegisterBotCommand<DetailsCommand, DetailsProcessor, TelegramBot>()
     .RegisterBotCommand<ScheduleCommand, ScheduleProcessor, TelegramBot>()
-    .RegisterBotCommand<CleanScheduleCommand, CleanScheduleProcessor, TelegramBot>();
+    .RegisterBotCommand<CleanScheduleCommand, CleanScheduleProcessor, TelegramBot>()
+    .RegisterBotCommand<SelectScheduleCommand, SelectScheduleProcessor, TelegramBot>()
+    .RegisterBotCommand<Minute, SelectScheduleMinuteProcessor, TelegramBot>();
 
 app.Run();
