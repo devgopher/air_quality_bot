@@ -7,6 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\botticelli\Botticelli.Bus.Rabbit\Botticelli.Bus.Rabbit.csproj" />
 		<ProjectReference Include="..\..\botticelli\Botticelli.Framework.Telegram\Botticelli.Framework.Telegram.csproj"/>
 		<ProjectReference Include="..\..\botticelli\Botticelli.Interfaces\Botticelli.Interfaces.csproj"/>
 		<ProjectReference Include="..\..\botticelli\Botticelli.Scheduler\Botticelli.Scheduler.csproj" />
@@ -59,6 +60,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.Identity.Core" Version="7.0.14"/>
+		<PackageReference Include="NLog.Targets.Seq" Version="3.1.0" />
 		<PackageReference Include="Npgsql" Version="7.0.6"/>
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.11"/>
 		<PackageReference Include="NLog" Version="5.2.8"/>

@@ -82,7 +82,7 @@ public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
         
         await _context.SaveChangesAsync(token);
         
-        await _bot.SendMessageAsync(new SendMessageRequest(message.Uid)
+        await Bot.SendMessageAsync(new SendMessageRequest(message.Uid)
         {
             Message = new Message
             {

@@ -54,6 +54,6 @@ public class SelectScheduleMinuteProcessor : CommandProcessor<Minute>
             }
         };
 
-        await _bot.SendMessageAsync(selectHourMessageRequest, options, token);
+        await Bot.SendMessageAsync(selectHourMessageRequest, options, token);
     }
 }

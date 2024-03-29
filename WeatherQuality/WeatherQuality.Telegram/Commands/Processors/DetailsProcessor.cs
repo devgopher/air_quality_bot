@@ -1,4 +1,5 @@
-﻿using Botticelli.Client.Analytics;
+﻿using Botticelli.Bot.Interfaces.Client;
+using Botticelli.Client.Analytics;
 using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
 using Botticelli.Shared.API.Client.Requests;
@@ -12,14 +13,16 @@ namespace WeatherQuality.Telegram.Commands.Processors;
 public class DetailsProcessor : CommandProcessor<DetailsCommand>
 {
     private readonly IDetailsDataProcessor _detailsDataProcessor;
+    private readonly IBusClient _busClient;
 
     public DetailsProcessor(ILogger<DetailsProcessor> logger,
         ICommandValidator<DetailsCommand> validator,
         MetricsProcessor metricsProcessor,
-        IDetailsDataProcessor detailsDataProcessor) : base(logger,
+        IDetailsDataProcessor detailsDataProcessor, IBusClient busClient) : base(logger,
         validator, metricsProcessor)
     {
         _detailsDataProcessor = detailsDataProcessor;
+        _busClient = busClient;
     }
 
     protected override Task InnerProcessContact(Message message, string args, CancellationToken token) =>
@@ -31,6 +34,9 @@ public class DetailsProcessor : CommandProcessor<DetailsCommand>
     protected override Task InnerProcessLocation(Message message, string args, CancellationToken token) =>
         throw new NotImplementedException();
 
-    protected override async Task InnerProcess(Message message, string args, CancellationToken token) 
-        => await _detailsDataProcessor.DetailsProcess(message, token);
+    protected override async Task InnerProcess(Message message, string args, CancellationToken token)
+    {
+        await _detailsDataProcessor.DetailsProcess(message, token);
+        await _busClient.SendAndGetResponse(new SendMessageRequest(Guid.NewGuid().ToString()), token);
+    }
 }

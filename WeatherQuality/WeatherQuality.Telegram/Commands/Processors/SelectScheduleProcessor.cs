@@ -73,6 +73,6 @@ public class SelectScheduleProcessor : CommandProcessor<SelectScheduleCommand>
             }
         };
 
-        await _bot.SendMessageAsync(selectHourMessageRequest, _options, token);
+        await Bot.SendMessageAsync(selectHourMessageRequest, _options, token);
     }
 }

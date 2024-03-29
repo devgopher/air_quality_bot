@@ -57,6 +57,6 @@ public class StartCommandProcessor : CommandProcessor<StartCommand>
             }
         };
 
-        await _bot.SendMessageAsync(greetingMessageRequest, _options, token);
+        await Bot.SendMessageAsync(greetingMessageRequest, _options, token);
     }
 }

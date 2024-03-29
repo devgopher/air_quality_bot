@@ -52,6 +52,6 @@ public class ScheduleProcessor : CommandProcessor<ScheduleCommand>
             }
         };
 
-        await _bot.SendMessageAsync(selectHourMessageRequest, Replies.GeneralReplyOptions, token);
+        await Bot.SendMessageAsync(selectHourMessageRequest, Replies.GeneralReplyOptions, token);
     }
 }

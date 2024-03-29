@@ -1,22 +1,26 @@
 using BotDataSecureStorage.Settings;
+using Botticelli.Bus.Rabbit.Extensions;
 using Botticelli.Framework.Commands.Validators;
 using Botticelli.Framework.Extensions;
 using Botticelli.Framework.Options;
 using Botticelli.Framework.Telegram;
 using Botticelli.Framework.Telegram.Extensions;
 using Botticelli.Framework.Telegram.Options;
+using Botticelli.Interfaces;
 using Botticelli.Scheduler;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using NLog.Extensions.Logging;
+using Telegram.Bot;
 using WeatherQuality.Infrastructure;
 using WeatherQuality.Integration;
 using WeatherQuality.Integration.Extensions;
 using WeatherQuality.Integration.Interfaces;
 using WeatherQuality.Integration.Settings;
 using WeatherQuality.Telegram;
+using WeatherQuality.Telegram.Bus;
 using WeatherQuality.Telegram.Commands;
 using WeatherQuality.Telegram.Commands.Processors;
 using WeatherQuality.Telegram.Commands.Validators;
@@ -63,6 +67,9 @@ builder.Services
     .AddBotCommand<ScheduleCommand, ScheduleProcessor, ScheduleValidator>()
     .AddBotCommand<SelectScheduleCommand, SelectScheduleProcessor, PassValidator<SelectScheduleCommand>>()
     .AddBotCommand<Minute, SelectScheduleMinuteProcessor, PassValidator<Minute>>()
+    .AddSingleton<AirQualityRequestHandler>()
+    .UseRabbitBusClient<IBot<TelegramBot>>(builder.Configuration)
+    .UseRabbitBusAgent<IBot<TelegramBot>, AirQualityRequestHandler>(builder.Configuration)
     .AddHangfire(cfg => cfg
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
         .UseSimpleAssemblyNameTypeSerializer()
