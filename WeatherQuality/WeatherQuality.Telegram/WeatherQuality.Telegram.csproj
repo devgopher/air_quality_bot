@@ -1,10 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
+
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\botticelli\Botticelli.Bus.Rabbit\Botticelli.Bus.Rabbit.csproj" />
@@ -49,20 +50,20 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="7.0.0"/>
-		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.11" />
-		<PackageReference Include="Hangfire.Core" Version="1.8.11" />
+		<PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="8.0.0" />
+		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.12" />
+		<PackageReference Include="Hangfire.Core" Version="1.8.12" />
 		<PackageReference Include="Hangfire.MemoryStorage" Version="1.8.0" />
 		<PackageReference Include="Hangfire.PostgreSql" Version="1.20.8" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.14"/>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.14">
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.4" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Identity.Core" Version="7.0.14"/>
-		<PackageReference Include="NLog.Targets.Seq" Version="3.1.0" />
-		<PackageReference Include="Npgsql" Version="7.0.6"/>
-		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.11"/>
+		<PackageReference Include="Microsoft.Extensions.Identity.Core" Version="8.0.4" />
+		<PackageReference Include="NLog.Targets.Seq" Version="4.0.0" />
+		<PackageReference Include="Npgsql" Version="8.0.2" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
 		<PackageReference Include="NLog" Version="5.2.8"/>
 		<PackageReference Include="NLog.Extensions.Logging" Version="5.3.8"/>
 	</ItemGroup>
