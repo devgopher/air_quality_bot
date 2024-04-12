@@ -26,16 +26,19 @@ public class GetAirQualityProcessor : CommandProcessor<GetAirQualityCommand>
         _busClient = busClient;
     }
 
-    protected override async Task InnerProcessContact(Message message, string args, CancellationToken token)
+    protected override Task InnerProcessContact(Message message, string args, CancellationToken token)
     {
+        return Task.CompletedTask;
     }
 
-    protected override async Task InnerProcessPoll(Message message, string args, CancellationToken token)
+    protected override Task InnerProcessPoll(Message message, string args, CancellationToken token)
     {
+        return Task.CompletedTask;
     }
 
-    protected override async Task InnerProcessLocation(Message message, string args, CancellationToken token)
+    protected override Task InnerProcessLocation(Message message, string args, CancellationToken token)
     {
+        return Task.CompletedTask;
     }
 
     protected override async Task InnerProcess(Message message, string args, CancellationToken token)

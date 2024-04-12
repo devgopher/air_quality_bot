@@ -17,16 +17,19 @@ public class SelectScheduleHourProcessor : CommandProcessor<HourCommand>
     {
     }
 
-    protected override async Task InnerProcessContact(Message message, string argsString, CancellationToken token)
+    protected override Task InnerProcessContact(Message message, string argsString, CancellationToken token)
     {
+        return Task.CompletedTask;
     }
 
-    protected override async Task InnerProcessPoll(Message message, string argsString, CancellationToken token)
+    protected override Task InnerProcessPoll(Message message, string argsString, CancellationToken token)
     {
+        return Task.CompletedTask;
     }
 
-    protected override async Task InnerProcessLocation(Message message, string argsString, CancellationToken token)
+    protected override Task InnerProcessLocation(Message message, string argsString, CancellationToken token)
     {
+        return Task.CompletedTask;
     }
 
     private static readonly int[] MinutesArray = new[] { 0, 15, 30, 45 };

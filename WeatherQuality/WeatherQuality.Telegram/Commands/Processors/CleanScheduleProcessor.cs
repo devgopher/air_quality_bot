@@ -14,11 +14,20 @@ public class CleanScheduleProcessor : CommandProcessor<CleanScheduleCommand>
     public CleanScheduleProcessor(ILogger<CleanScheduleProcessor> logger, ICommandValidator<CleanScheduleCommand> validator, MetricsProcessor metricsProcessor) : base(logger, validator, metricsProcessor) 
     {}
 
-    protected override async Task InnerProcessContact(Message message, string args, CancellationToken token) => throw new NotImplementedException();
+    protected override Task InnerProcessContact(Message message, string args, CancellationToken token)
+    {
+        throw new NotImplementedException();
+    }
 
-    protected override async Task InnerProcessPoll(Message message, string args, CancellationToken token) => throw new NotImplementedException();
+    protected override Task InnerProcessPoll(Message message, string args, CancellationToken token)
+    {
+        throw new NotImplementedException();
+    }
 
-    protected override async Task InnerProcessLocation(Message message, string args, CancellationToken token) => throw new NotImplementedException();
+    protected override Task InnerProcessLocation(Message message, string args, CancellationToken token)
+    {
+        throw new NotImplementedException();
+    }
 
     protected override async Task InnerProcess(Message message, string args, CancellationToken token)
     {
