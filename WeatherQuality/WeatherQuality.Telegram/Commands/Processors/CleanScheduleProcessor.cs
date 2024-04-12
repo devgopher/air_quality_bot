@@ -1,9 +1,11 @@
 ﻿using Botticelli.Client.Analytics;
 using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
+using Botticelli.Shared.API.Client.Requests;
 using Botticelli.Shared.ValueObjects;
 using Hangfire;
 using Hangfire.Storage;
+using WeatherQuality.Telegram.Commands.ReplyOptions;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
 
@@ -28,5 +30,18 @@ public class CleanScheduleProcessor : CommandProcessor<CleanScheduleCommand>
             foreach (var job in jobs) 
                 RecurringJob.RemoveIfExists(job.Id);
         }
+        
+        var scheduleCleanedMessageRequest = new SendMessageRequest(Guid.NewGuid().ToString())
+        {
+            Message = new Message
+            {
+                Uid = Guid.NewGuid().ToString(),
+                ChatIds = message.ChatIds,
+                Body = "Schedule cleaned..."
+            }
+        };
+
+        await Bot.SendMessageAsync(scheduleCleanedMessageRequest, Replies.GeneralReplyOptions, token);
+        
     }
 }
