@@ -8,10 +8,10 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
 
-public class SelectScheduleMinuteProcessor : CommandProcessor<Minute>
+public class SelectScheduleHourProcessor : CommandProcessor<SetHourCommand>
 {
-    public SelectScheduleMinuteProcessor(ILogger<SelectScheduleMinuteProcessor> logger,
-        ICommandValidator<Minute> validator,
+    public SelectScheduleHourProcessor(ILogger<SelectScheduleHourProcessor> logger,
+        ICommandValidator<SetHourCommand> validator,
         MetricsProcessor metricsProcessor)
         : base(logger, validator, metricsProcessor)
     {
@@ -29,11 +29,13 @@ public class SelectScheduleMinuteProcessor : CommandProcessor<Minute>
     {
     }
 
+    private static readonly int[] MinutesArray = new[] { 0, 15, 30, 45 };
+
     protected override async Task InnerProcess(Message message, string args, CancellationToken token)
     {
         var options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
-        {
-            new[] { 0, 15, 30, 45 }.Select(
+        { 
+            MinutesArray.Select(
                 x => new KeyboardButton($"/Schedule {args}:{x:D2}")
                 {
                     RequestLocation = false
