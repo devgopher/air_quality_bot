@@ -66,7 +66,7 @@ builder.Services
     .AddBotCommand<DetailsCommand, DetailsProcessor, PassValidator<DetailsCommand>>()
     .AddBotCommand<ScheduleCommand, ScheduleProcessor, ScheduleValidator>()
     .AddBotCommand<SelectScheduleCommand, SelectScheduleProcessor, PassValidator<SelectScheduleCommand>>()
-    .AddBotCommand<SetHourCommand, SelectScheduleHourProcessor, PassValidator<SetHourCommand>>()
+    .AddBotCommand<HourCommand, SelectScheduleHourProcessor, PassValidator<HourCommand>>()
     .AddSingleton<AirQualityRequestHandler>()
     .UseRabbitBusClient<IBot<TelegramBot>>(builder.Configuration)
     .UseRabbitBusAgent<IBot<TelegramBot>, AirQualityRequestHandler>(builder.Configuration)
@@ -98,6 +98,6 @@ app.Services.RegisterBotCommand<StartCommand, StartCommandProcessor, TelegramBot
     .RegisterBotCommand<ScheduleCommand, ScheduleProcessor, TelegramBot>()
     .RegisterBotCommand<CleanScheduleCommand, CleanScheduleProcessor, TelegramBot>()
     .RegisterBotCommand<SelectScheduleCommand, SelectScheduleProcessor, TelegramBot>()
-    .RegisterBotCommand<SetHourCommand, SelectScheduleHourProcessor, TelegramBot>();
+    .RegisterBotCommand<HourCommand, SelectScheduleHourProcessor, TelegramBot>();
 
 app.Run();

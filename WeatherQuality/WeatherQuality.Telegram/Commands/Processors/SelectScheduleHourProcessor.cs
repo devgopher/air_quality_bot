@@ -8,10 +8,10 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
 
-public class SelectScheduleHourProcessor : CommandProcessor<SetHourCommand>
+public class SelectScheduleHourProcessor : CommandProcessor<HourCommand>
 {
     public SelectScheduleHourProcessor(ILogger<SelectScheduleHourProcessor> logger,
-        ICommandValidator<SetHourCommand> validator,
+        ICommandValidator<HourCommand> validator,
         MetricsProcessor metricsProcessor)
         : base(logger, validator, metricsProcessor)
     {

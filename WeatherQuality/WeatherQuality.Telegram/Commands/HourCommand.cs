@@ -2,7 +2,7 @@
 
 namespace WeatherQuality.Telegram.Commands;
 
-public class SetHourCommand : ICommand
+public class HourCommand : ICommand
 {
     public Guid Id { get; }
 }

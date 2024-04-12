@@ -20,25 +20,25 @@ public class SelectScheduleProcessor : CommandProcessor<SelectScheduleCommand>
         _options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
         {
             Enumerable.Range(0, 6).Select(
-                x => new KeyboardButton($"/SetHour {x:D2}")
+                x => new KeyboardButton($"/Hour {x:D2}")
                 {
                     RequestLocation = false
                 }
             ),
             Enumerable.Range(6, 6).Select(
-                x => new KeyboardButton($"/SetHour {x:D2}")
+                x => new KeyboardButton($"/Hour {x:D2}")
                 {
                     RequestLocation = false
                 }
             ),
             Enumerable.Range(12, 6).Select(
-                x => new KeyboardButton($"/SetHour {x:D2}")
+                x => new KeyboardButton($"/Hour {x:D2}")
                 {
                     RequestLocation = false
                 }
             ),
             Enumerable.Range(18, 6).Select(
-                x => new KeyboardButton($"/SetHour {x:D2}")
+                x => new KeyboardButton($"/Hour {x:D2}")
                 {
                     RequestLocation = false
                 }
