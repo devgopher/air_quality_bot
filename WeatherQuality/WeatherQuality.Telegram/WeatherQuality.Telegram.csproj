@@ -9,6 +9,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\botticelli\Botticelli.Bus.Rabbit\Botticelli.Bus.Rabbit.csproj" />
+		<ProjectReference Include="..\..\botticelli\Botticelli.Bus\Botticelli.Bus.None.csproj" />
 		<ProjectReference Include="..\..\botticelli\Botticelli.Framework.Telegram\Botticelli.Framework.Telegram.csproj"/>
 		<ProjectReference Include="..\..\botticelli\Botticelli.Interfaces\Botticelli.Interfaces.csproj"/>
 		<ProjectReference Include="..\..\botticelli\Botticelli.Scheduler\Botticelli.Scheduler.csproj" />

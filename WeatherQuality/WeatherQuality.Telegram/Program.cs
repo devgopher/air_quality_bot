@@ -1,4 +1,5 @@
 using BotDataSecureStorage.Settings;
+using Botticelli.Bus.None.Extensions;
 using Botticelli.Bus.Rabbit.Extensions;
 using Botticelli.Framework.Commands.Validators;
 using Botticelli.Framework.Extensions;
@@ -68,8 +69,10 @@ builder.Services
     .AddBotCommand<SelectScheduleCommand, SelectScheduleProcessor, PassValidator<SelectScheduleCommand>>()
     .AddBotCommand<HourCommand, SelectScheduleHourProcessor, PassValidator<HourCommand>>()
     .AddSingleton<AirQualityRequestHandler>()
-    .UseRabbitBusClient<IBot<TelegramBot>>(builder.Configuration)
-    .UseRabbitBusAgent<IBot<TelegramBot>, AirQualityRequestHandler>(builder.Configuration)
+    .UsePassBusClient<IBot<TelegramBot>>()
+    .UsePassBusAgent<IBot<TelegramBot>, AirQualityRequestHandler>()
+    // .UseRabbitBusClient<IBot<TelegramBot>>(builder.Configuration)
+    // .UseRabbitBusAgent<IBot<TelegramBot>, AirQualityRequestHandler>(builder.Configuration)
     .AddHangfire(cfg => cfg
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
         .UseSimpleAssemblyNameTypeSerializer()
