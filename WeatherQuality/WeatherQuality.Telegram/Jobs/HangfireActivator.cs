@@ -4,13 +4,8 @@ public class HangfireActivator : Hangfire.JobActivator
 {
     private readonly IServiceCollection _services;
 
-    public HangfireActivator(IServiceCollection services)
-    {
-        _services = services;
-    }
+    public HangfireActivator(IServiceCollection services) => _services = services;
 
-    public override object ActivateJob(Type type)
-    {
-        return _services.BuildServiceProvider().GetRequiredService(type);
-    }
+    public override object ActivateJob(Type type) 
+        => _services.BuildServiceProvider().GetRequiredService(type);
 }
