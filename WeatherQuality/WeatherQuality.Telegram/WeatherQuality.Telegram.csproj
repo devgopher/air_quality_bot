@@ -52,9 +52,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="8.0.0" />
-		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.12" />
-		<PackageReference Include="Hangfire.Core" Version="1.8.12" />
-		<PackageReference Include="Hangfire.MemoryStorage" Version="1.8.0" />
+		<PackageReference Include="Hangfire.DynamicJobs" Version="0.2.0" />
 		<PackageReference Include="Hangfire.PostgreSql" Version="1.20.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.4" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">

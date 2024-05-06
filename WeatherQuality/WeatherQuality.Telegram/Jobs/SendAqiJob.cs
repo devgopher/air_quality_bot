@@ -19,7 +19,7 @@ public class SendAqiJob
     public async Task Execute(Message message, IJobCancellationToken token)
     {
         _logger.LogInformation($"SendAqiJob started...");
-
+        
         try
         {
             await _aqiDataProcessor.AqiProcess(message, token.ShutdownToken);
@@ -28,7 +28,7 @@ public class SendAqiJob
         {
             _logger.LogError(ex, "SendAqiJob error: {msg}", ex.Message);
         }
-
+        
         _logger.LogInformation($"SendAqiJob end...");
     }
 }

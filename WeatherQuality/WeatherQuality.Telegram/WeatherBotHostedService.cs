@@ -28,7 +28,7 @@ public class WeatherBotHostedService : IHostedService
         RecurringJob.AddOrUpdate<ClearCacheJob>("CleanCacheJob", 
             job => job.Execute(JobCancellationToken.Null),
             Cron.Daily);
-
+        
         return Task.CompletedTask;
     }
 
