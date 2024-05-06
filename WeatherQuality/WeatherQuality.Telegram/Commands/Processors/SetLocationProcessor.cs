@@ -4,6 +4,7 @@ using Botticelli.Framework.Commands.Validators;
 using Botticelli.Framework.SendOptions;
 using Botticelli.Shared.API.Client.Requests;
 using Botticelli.Shared.ValueObjects;
+using Flurl.Http;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot.Types.ReplyMarkups;
 using WeatherQuality.Infrastructure;
@@ -58,22 +59,22 @@ public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
     protected override async Task InnerProcessLocation(Message message, string args, CancellationToken token)
     {
         var entity = await _context
-                           .UserLocationModels
-                           .FirstOrDefaultAsync(e => e.ChatId ==
-                                                     message
-                                                             .ChatIds
-                                                             .FirstOrDefault(),
-                                                token);
+            .UserLocationModels
+            .FirstOrDefaultAsync(e => e.ChatId ==
+                                      message
+                                          .ChatIds
+                                          .FirstOrDefault(),
+                token);
 
         if (entity == null)
         {
             await _context.UserLocationModels.AddAsync(new UserLocationModel
-                                                       {
-                                                           ChatId = message.ChatIds.FirstOrDefault()!,
-                                                           Longitude = (float)message.Location?.Longitude!,
-                                                           Latitude = (float)message.Location?.Latitude!
-                                                       },
-                                                       token);
+                {
+                    ChatId = message.ChatIds.FirstOrDefault()!,
+                    Longitude = (float)message.Location?.Longitude!,
+                    Latitude = (float)message.Location?.Latitude!
+                },
+                token);
         }
         else
         {
@@ -82,19 +83,27 @@ public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
 
             _context.Update(entity);
         }
-        
+
         await _context.SaveChangesAsync(token);
-        
-        await Bot.SendMessageAsync(new SendMessageRequest(message.Uid)
+
+        try
         {
-            Message = new Message
+
+            await Bot.SendMessageAsync(new SendMessageRequest(message.Uid)
             {
-                Uid = message.Uid,
-                ChatIds = message.ChatIds,
-                Subject = "Location received...",
-                Body = "Now you may get air quality"
-            }
-        }, _options, token);
+                Message = new Message
+                {
+                    Uid = message.Uid,
+                    ChatIds = message.ChatIds,
+                    Subject = "Location received...",
+                    Body = "Now you may get air quality"
+                }
+            }, _options, token);
+        }
+        catch (FlurlHttpException ex)
+        {
+            // Todo: logging
+        }
     }
 
     protected override Task InnerProcess(Message message, string args, CancellationToken token)
