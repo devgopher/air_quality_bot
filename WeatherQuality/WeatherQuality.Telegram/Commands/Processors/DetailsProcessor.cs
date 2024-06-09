@@ -31,7 +31,7 @@ public class DetailsProcessor : CommandProcessor<DetailsCommand>
     protected override Task InnerProcessPoll(Message message, string args, CancellationToken token) =>
         throw new NotImplementedException();
 
-    protected override Task InnerProcessLocation(Message message, string args, CancellationToken token) {}
+    protected override Task InnerProcessLocation(Message message, string args, CancellationToken token) => Task.CompletedTask;
 
     protected override async Task InnerProcess(Message message, string args, CancellationToken token)
     {
