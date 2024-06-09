@@ -193,9 +193,9 @@ public class AqiDataProcessor : IAqiDataProcessor, IDetailsDataProcessor
         };
 
         if (image != null)
-            respMessage.Attachments = new List<IAttachment>()
+            respMessage.Attachments = new List<BaseAttachment>()
             {
-                new BinaryAttachment(Guid.NewGuid().ToString(),
+                new BinaryBaseAttachment(Guid.NewGuid().ToString(),
                     "air",
                     MediaType.Image,
                     string.Empty,
