@@ -11,6 +11,7 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using NLog.Extensions.Logging;
+using Telegram.Bot.Types.ReplyMarkups;
 using WeatherQuality.Infrastructure;
 using WeatherQuality.Integration;
 using WeatherQuality.Integration.Extensions;
@@ -58,12 +59,13 @@ builder.Services
     .AddBotCommand<StartCommand, StartCommandProcessor, PassValidator<StartCommand>>()
     .AddBotCommand<StopCommand, StopCommandProcessor, PassValidator<StopCommand>>()
     .AddBotCommand<GetAirQualityCommand, GetAirQualityProcessor, PassValidator<GetAirQualityCommand>>()
-    .AddBotCommand<SetLocationCommand, SetLocationProcessor, PassValidator<SetLocationCommand>>()
+    .AddBotCommand<SetLocationCommand, SetLocationProcessor<InlineKeyboardMarkup>, PassValidator<SetLocationCommand>>()
     .AddBotCommand<CleanScheduleCommand, CleanScheduleProcessor, PassValidator<CleanScheduleCommand>>()
     .AddBotCommand<DetailsCommand, DetailsProcessor, PassValidator<DetailsCommand>>()
     .AddBotCommand<ScheduleCommand, ScheduleProcessor, ScheduleValidator>()
     .AddBotCommand<SelectScheduleCommand, SelectScheduleProcessor, PassValidator<SelectScheduleCommand>>()
     .AddBotCommand<HourCommand, SelectScheduleHourProcessor, PassValidator<HourCommand>>()
+    .AddTelegramLayoutsSupport()
     .AddSingleton<AirQualityRequestHandler>()
     .UsePassBusClient<IBot<TelegramBot>>()
     .UsePassBusAgent<IBot<TelegramBot>, AirQualityRequestHandler>()
@@ -92,7 +94,7 @@ var app = builder.Build();
 app.Services.RegisterBotCommand<StartCommand, StartCommandProcessor, TelegramBot>()
    .RegisterBotCommand<StopCommand, StopCommandProcessor, TelegramBot>()
    .RegisterBotCommand<GetAirQualityCommand, GetAirQualityProcessor, TelegramBot>()
-   .RegisterBotCommand<SetLocationCommand, SetLocationProcessor, TelegramBot>()
+   .RegisterBotCommand<SetLocationCommand, SetLocationProcessor<InlineKeyboardMarkup>, TelegramBot>()
    .RegisterBotCommand<DetailsCommand, DetailsProcessor, TelegramBot>()
    .RegisterBotCommand<ScheduleCommand, ScheduleProcessor, TelegramBot>()
    .RegisterBotCommand<CleanScheduleCommand, CleanScheduleProcessor, TelegramBot>()

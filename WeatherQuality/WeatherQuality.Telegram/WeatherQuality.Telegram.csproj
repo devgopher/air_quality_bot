@@ -10,8 +10,12 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\botticelli\Botticelli.Bus.Rabbit\Botticelli.Bus.Rabbit.csproj" />
 		<ProjectReference Include="..\..\botticelli\Botticelli.Bus\Botticelli.Bus.None.csproj" />
+		<ProjectReference Include="..\..\botticelli\Botticelli.Framework.Controls.Layouts\Botticelli.Framework.Controls.Layouts.csproj" />
 		<ProjectReference Include="..\..\botticelli\Botticelli.Framework.Telegram\Botticelli.Framework.Telegram.csproj"/>
 		<ProjectReference Include="..\..\botticelli\Botticelli.Interfaces\Botticelli.Interfaces.csproj"/>
+		<ProjectReference Include="..\..\botticelli\Botticelli.Locations.Controls\Botticelli.Locations.Controls.csproj" />
+		<ProjectReference Include="..\..\botticelli\Botticelli.Locations.Telegram\Botticelli.Locations.Telegram.csproj" />
+		<ProjectReference Include="..\..\botticelli\Botticelli.Locations\Botticelli.Locations.csproj" />
 		<ProjectReference Include="..\..\botticelli\Botticelli.Scheduler\Botticelli.Scheduler.csproj" />
 		<ProjectReference Include="..\WeatherQuality.Infrastructure\WeatherQuality.Infrastructure.csproj"/>
 		<ProjectReference Include="..\WeatherQuality.Integration\WeatherQuality.Integration.csproj"/>

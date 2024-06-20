@@ -1,6 +1,10 @@
 ﻿using Botticelli.Client.Analytics;
 using Botticelli.Framework.Commands.Processors;
 using Botticelli.Framework.Commands.Validators;
+using Botticelli.Framework.Controls.BasicControls;
+using Botticelli.Framework.Controls.Layouts;
+using Botticelli.Framework.Controls.Layouts.Inlines;
+using Botticelli.Framework.Controls.Parsers;
 using Botticelli.Framework.SendOptions;
 using Botticelli.Shared.API.Client.Requests;
 using Botticelli.Shared.ValueObjects;
@@ -12,37 +16,44 @@ using WeatherQuality.Infrastructure.Models;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
 
-public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
+public class SetLocationProcessor<TReplyMarkup> : CommandProcessor<SetLocationCommand> where TReplyMarkup : class
 {
     private readonly WeatherQualityContext _context;
-    private readonly SendOptionsBuilder<ReplyMarkupBase> _options;
+    private readonly ILayoutSupplier<TReplyMarkup> _layoutSupplier;
+    private readonly SendOptionsBuilder<TReplyMarkup> _options;
     
-    public SetLocationProcessor(ILogger<SetLocationProcessor> logger, ICommandValidator<SetLocationCommand> validator, MetricsProcessor metricsProcessor, WeatherQualityContext context) 
+    public SetLocationProcessor(ILogger<SetLocationProcessor<TReplyMarkup>> logger,
+                                ICommandValidator<SetLocationCommand> validator, 
+                                MetricsProcessor metricsProcessor,
+                                WeatherQualityContext context,
+                                ILayoutSupplier<TReplyMarkup> layoutSupplier) 
         : base(logger, validator, metricsProcessor)
     {
         _context = context;
-        _options = SendOptionsBuilder<ReplyMarkupBase>.CreateBuilder(new ReplyKeyboardMarkup(new[]
+        _layoutSupplier = layoutSupplier;
+        var markup = new InlineButtonMenu(2, 3);
+
+
+        markup.AddControl(new Button
         {
-            new[]
-            {
-                new KeyboardButton("/Details")
-                {
-                    RequestLocation = false
-                },
-                new KeyboardButton("/GetAirQuality")
-                {
-                    RequestLocation = false
-                },
-                new KeyboardButton("/SetLocation")
-                {
-                    RequestLocation = true
-                }
-            }
-        })
-        {
-            ResizeKeyboard = true,
-            IsPersistent = true
+            Content = "Details",
+            CallbackData = "/Details"
         });
+
+        markup.AddControl(new Button
+        {
+            Content = "Get quality",
+            CallbackData = "/GetAirQuality"
+        });
+
+        markup.AddControl(new Button
+        {
+            Content = "Set location",
+            CallbackData = "/SetLocation"
+        });
+
+        var responseMarkup = _layoutSupplier.GetMarkup(markup);
+        _options = SendOptionsBuilder<TReplyMarkup>.CreateBuilder(responseMarkup);
     }
 
     protected override Task InnerProcessContact(Message message, string args, CancellationToken token)
@@ -88,7 +99,6 @@ public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
 
         try
         {
-
             await Bot.SendMessageAsync(new SendMessageRequest(message.Uid)
             {
                 Message = new Message
