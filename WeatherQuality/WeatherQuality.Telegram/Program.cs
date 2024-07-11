@@ -6,6 +6,7 @@ using Botticelli.Framework.Telegram;
 using Botticelli.Framework.Telegram.Extensions;
 using Botticelli.Framework.Telegram.Options;
 using Botticelli.Interfaces;
+using Botticelli.Locations.Telegram.Extensions;
 using Botticelli.SecureStorage.Settings;
 using Hangfire;
 using Hangfire.PostgreSql;
@@ -59,7 +60,7 @@ builder.Services
     .AddBotCommand<StartCommand, StartCommandProcessor, PassValidator<StartCommand>>()
     .AddBotCommand<StopCommand, StopCommandProcessor, PassValidator<StopCommand>>()
     .AddBotCommand<GetAirQualityCommand, GetAirQualityProcessor, PassValidator<GetAirQualityCommand>>()
-    .AddBotCommand<SetLocationCommand, SetLocationProcessor<InlineKeyboardMarkup>, PassValidator<SetLocationCommand>>()
+    .AddBotCommand<SetLocationCommand, SetLocationProcessor, PassValidator<SetLocationCommand>>()
     .AddBotCommand<CleanScheduleCommand, CleanScheduleProcessor, PassValidator<CleanScheduleCommand>>()
     .AddBotCommand<DetailsCommand, DetailsProcessor, PassValidator<DetailsCommand>>()
     .AddBotCommand<ScheduleCommand, ScheduleProcessor, ScheduleValidator>()
@@ -69,6 +70,7 @@ builder.Services
     .AddSingleton<AirQualityRequestHandler>()
     .UsePassBusClient<IBot<TelegramBot>>()
     .UsePassBusAgent<IBot<TelegramBot>, AirQualityRequestHandler>()
+    .AddOsmLocations(builder.Configuration)
     // .UseRabbitBusClient<IBot<TelegramBot>>(builder.Configuration)
     // .UseRabbitBusAgent<IBot<TelegramBot>, AirQualityRequestHandler>(builder.Configuration)
     .AddHangfire(cfg => cfg.UseDynamicJobs()
@@ -94,12 +96,13 @@ var app = builder.Build();
 app.Services.RegisterBotCommand<StartCommand, StartCommandProcessor, TelegramBot>()
    .RegisterBotCommand<StopCommand, StopCommandProcessor, TelegramBot>()
    .RegisterBotCommand<GetAirQualityCommand, GetAirQualityProcessor, TelegramBot>()
-   .RegisterBotCommand<SetLocationCommand, SetLocationProcessor<InlineKeyboardMarkup>, TelegramBot>()
+   .RegisterBotCommand<SetLocationCommand, SetLocationProcessor, TelegramBot>()
    .RegisterBotCommand<DetailsCommand, DetailsProcessor, TelegramBot>()
    .RegisterBotCommand<ScheduleCommand, ScheduleProcessor, TelegramBot>()
    .RegisterBotCommand<CleanScheduleCommand, CleanScheduleProcessor, TelegramBot>()
    .RegisterBotCommand<SelectScheduleCommand, SelectScheduleProcessor, TelegramBot>()
-   .RegisterBotCommand<HourCommand, SelectScheduleHourProcessor, TelegramBot>();
+   .RegisterBotCommand<HourCommand, SelectScheduleHourProcessor, TelegramBot>()
+   .RegisterOsmLocationsCommands();
 
 
 app.UseHangfireServer();

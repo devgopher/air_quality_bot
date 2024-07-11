@@ -13,47 +13,23 @@ using Microsoft.EntityFrameworkCore;
 using Telegram.Bot.Types.ReplyMarkups;
 using WeatherQuality.Infrastructure;
 using WeatherQuality.Infrastructure.Models;
+using WeatherQuality.Telegram.Commands.ReplyOptions;
 
 namespace WeatherQuality.Telegram.Commands.Processors;
 
-public class SetLocationProcessor<TReplyMarkup> : CommandProcessor<SetLocationCommand> where TReplyMarkup : class
+public class SetLocationProcessor : CommandProcessor<SetLocationCommand>
 {
     private readonly WeatherQualityContext _context;
-    private readonly ILayoutSupplier<TReplyMarkup> _layoutSupplier;
-    private readonly SendOptionsBuilder<TReplyMarkup> _options;
+    private readonly SendOptionsBuilder<InlineKeyboardMarkup> _options;
     
-    public SetLocationProcessor(ILogger<SetLocationProcessor<TReplyMarkup>> logger,
+    public SetLocationProcessor(ILogger<SetLocationProcessor> logger,
                                 ICommandValidator<SetLocationCommand> validator, 
                                 MetricsProcessor metricsProcessor,
-                                WeatherQualityContext context,
-                                ILayoutSupplier<TReplyMarkup> layoutSupplier) 
+                                WeatherQualityContext context) 
         : base(logger, validator, metricsProcessor)
     {
         _context = context;
-        _layoutSupplier = layoutSupplier;
-        var markup = new InlineButtonMenu(2, 3);
-
-
-        markup.AddControl(new Button
-        {
-            Content = "Details",
-            CallbackData = "/Details"
-        });
-
-        markup.AddControl(new Button
-        {
-            Content = "Get quality",
-            CallbackData = "/GetAirQuality"
-        });
-
-        markup.AddControl(new Button
-        {
-            Content = "Set location",
-            CallbackData = "/SetLocation"
-        });
-
-        var responseMarkup = _layoutSupplier.GetMarkup(markup);
-        _options = SendOptionsBuilder<TReplyMarkup>.CreateBuilder(responseMarkup);
+        _options = Replies.GeneralReplyOptions;
     }
 
     protected override Task InnerProcessContact(Message message, string args, CancellationToken token)
