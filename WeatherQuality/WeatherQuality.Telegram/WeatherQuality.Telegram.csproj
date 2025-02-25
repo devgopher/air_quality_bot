@@ -52,20 +52,20 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="8.0.0" />
-		<PackageReference Include="Hangfire" Version="1.8.12" />
-		<PackageReference Include="Hangfire.DynamicJobs" Version="0.2.0" />
+		<PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="8.1.2" />
+		<PackageReference Include="Hangfire" Version="1.8.18" />
+		<PackageReference Include="Hangfire.DynamicJobs" Version="0.3.0" />
 		<PackageReference Include="Hangfire.MemoryStorage" Version="1.8.1.1" />
-		<PackageReference Include="Hangfire.PostgreSql" Version="1.20.8" />
+		<PackageReference Include="Hangfire.PostgreSql" Version="1.20.10" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.6" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.Identity.Core" Version="8.0.6" />
-		<PackageReference Include="NLog.Targets.Seq" Version="4.0.0" />
-		<PackageReference Include="NLog" Version="5.2.8"/>
-		<PackageReference Include="NLog.Extensions.Logging" Version="5.3.8"/>
+		<PackageReference Include="NLog.Targets.Seq" Version="4.0.1" />
+		<PackageReference Include="NLog" Version="5.4.0" />
+		<PackageReference Include="NLog.Extensions.Logging" Version="5.4.0" />
 	</ItemGroup>
 
 </Project>
