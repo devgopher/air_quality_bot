@@ -28,11 +28,11 @@ public static class Replies
                 CallbackData = "/GetAirQuality"
             });
 
-            markup.AddControl(new Button
-            {
-                Content = "Set location",
-                CallbackData = "/SetLocation"
-            });
+            // markup.AddControl(new Button
+            // {
+            //     Content = "Set location",
+            //     CallbackData = "/SetLocation"
+            // });
 
             var responseMarkup = _layoutSupplier.GetMarkup(markup);
 
